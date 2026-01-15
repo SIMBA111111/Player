@@ -27,9 +27,18 @@ export const VideoTagHandlers = (
         setIsVisibleTools(true);
     };
 
+    const handlePlayPause = (videoRef: RefObject<HTMLVideoElement | null>) => {
+      if (videoRef.current?.paused) {
+        videoRef.current?.play()
+      } else {
+        videoRef.current?.pause()
+      }
+    }
+
     return {
         handleMouseMove,
         handleMouseLeave,
-        handleMouseOver
+        handleMouseOver,
+        handlePlayPause
     };
 };

@@ -123,20 +123,12 @@ export const PlayerTools: React.FC<IPlayerTools> = ({
     };
 
     return (
-        <div className={styles.toolsContainer}>
-            <button 
-                className={isVisibleTools ? styles.playBtn : styles.playBtn_hidden} 
-                onClick={() => handlePlayPause(videoRef, hls)}
-            >
-                {videoRef.current?.paused ? "▶" : "⏸"}
-            </button>
-            
+        <div className={styles.toolsContainer}>            
             <div 
                 ref={progressContainerRef}
-                className={styles.progressContainer}
+                className={isVisibleTools ? styles.progressContainer : styles.progressContainer_hidden}
                 onClick={handleProgressClick}
                 onMouseDown={handleMouseDown}
-                // Убираем локальные onMouseMove и onMouseUp
             >
                 {/* Фоновый слой прогресс-бара */}
                 <div className={styles.progressBackground}></div>
@@ -153,6 +145,12 @@ export const PlayerTools: React.FC<IPlayerTools> = ({
                     style={{ left: `${progress + 1.5}%` }}
                 ></div> */}
             </div>
+            <button 
+                className={isVisibleTools ? styles.playBtn : styles.playBtn_hidden} 
+                onClick={() => handlePlayPause(videoRef)}
+            >
+                {videoRef.current?.paused ? "▶" : "⏸"}
+            </button>
         </div>
     );
 };
