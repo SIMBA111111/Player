@@ -1,0 +1,31 @@
+.playerContainer {
+    position: relative;
+    height: 300px;
+    width: 400px;
+    cursor: pointer;
+
+    &_hidden {
+        position: relative;
+        height: 300px;
+        width: 400px;
+        cursor: none;
+    }
+}
+
+.video {
+    height: 100%;
+    width: 100%;
+    // position: absolute;
+}
+
+.playBtn {
+    color: white;
+    position: absolute;
+    top: 50%;
+    right: 50%;
+    display: block;
+
+    &_hidden {
+        display: none;
+    }
+}
