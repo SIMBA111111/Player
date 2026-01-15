@@ -1,0 +1,11 @@
+.playBtn {
+    color: white;
+    position: absolute;
+    top: 50%;
+    right: 50%;
+    display: block;
+
+    &_hidden {
+        display: none;
+    }
+}

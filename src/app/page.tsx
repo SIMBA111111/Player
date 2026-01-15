@@ -3,7 +3,7 @@
 import Hls from "hls.js";
 import { useEffect, useRef, useState } from "react";
 
-import styles from './styles.module.scss'
+import { VideoTag } from "@/widget/video-tag/ui/video-tag";
 
 export default function Home() {
   const [isVisibleTools, setIsVisibleTools] = useState(false)
@@ -24,36 +24,7 @@ export default function Home() {
     console.log('video and hls.js are now bound together !');
   });
 
-  const handlePlayPause = () => {
-    if (videoRef.current?.paused) {
-      videoRef.current?.play()
-    } else {
-      videoRef.current?.pause()
-    }
-  }
-
-  const handleMouseMove = () => {
-    setIsVisibleTools(true)
-    clearTimeout(hideToolsTimer.current)
-    hideToolsTimer.current = setTimeout(() => {setIsVisibleTools(false)}, 2000)
-  }
-
-  const handleMouseLeave = () => {
-    clearTimeout(hideToolsTimer.current)
-    setIsVisibleTools(false)
-  }
-
-  const handleMouseOver = () => {
-    setIsVisibleTools(true)
-  }
-
-  console.log(hls.levels);
-  
-
   return (
-    <div className={isVisibleTools ? styles.playerContainer : styles.playerContainer_hidden} onMouseMove={() => {handleMouseMove()}} onMouseLeave={() => {handleMouseLeave()}} onMouseOver={()=>{handleMouseOver()}}>
-      <video className={styles.video} id='video' ref={videoRef}></video>
-      <button className={isVisibleTools ? styles.playBtn : styles.playBtn_hidden} onClick={() => {handlePlayPause()}}>PLAY</button>
-    </div>    
+    <VideoTag videoRef={videoRef} hideToolsTimer={hideToolsTimer} isVisibleTools={isVisibleTools} setIsVisibleTools={setIsVisibleTools}/>
   );
 }
