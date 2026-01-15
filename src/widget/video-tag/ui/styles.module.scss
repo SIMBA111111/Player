@@ -1,13 +1,13 @@
 .playerContainer {
     position: relative;
     // height: 300px;
-    width: 400px;
+    width: 900px;
     cursor: pointer;
 
     &_hidden {
         position: relative;
         // height: 300px;
-        width: 400px;
+        width: 900px;
         cursor: none;
     }
 }

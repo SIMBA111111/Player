@@ -37,10 +37,6 @@ export default function Home() {
     console.log('ПОТОК ЗАКОНЧИЛСЯ! (HLS ended)');
   });
 
-  
-
-
-
   return (
     <VideoTag hls={hls} duration={VIDEODATA.duration} videoRef={videoRef} hideToolsTimer={hideToolsTimer} isVisibleTools={isVisibleTools} setIsVisibleTools={setIsVisibleTools}/>
   );
