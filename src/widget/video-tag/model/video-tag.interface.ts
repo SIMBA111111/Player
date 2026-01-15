@@ -1,6 +1,9 @@
+import { HlsEventEmitter } from "hls.js";
 import { RefObject } from "react";
 
 export interface IVideoTag {
+    hls: HlsEventEmitter
+    duration: number
     hideToolsTimer: RefObject<any>
     videoRef: RefObject<HTMLVideoElement | null>
     isVisibleTools: boolean
