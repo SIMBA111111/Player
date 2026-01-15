@@ -89,7 +89,6 @@ export const PlayerTools: React.FC<IPlayerTools> = ({
         const newProgress = clickPercentage * 100;
         
         // Только обновляем preview при перетаскивании
-        progressThumb.current = newProgress
         setProgress(newProgress);
         // Фактическую перемотку делаем в handleMouseUp
     };

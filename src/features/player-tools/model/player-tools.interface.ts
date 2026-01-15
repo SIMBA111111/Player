@@ -2,7 +2,7 @@ import { HlsEventEmitter } from "hls.js";
 import { RefObject } from "react";
 
 export interface IPlayerTools {
-    hls: HlsEventEmitter
+    hls: any
     duration: number
     videoRef: RefObject<HTMLVideoElement | null>
     isVisibleTools: boolean
