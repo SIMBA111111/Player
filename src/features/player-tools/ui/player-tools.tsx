@@ -1,10 +1,11 @@
 'use client'
 
 import { useEffect, useState, useRef, useCallback } from "react";
-import { handleDocumentMouseMove, handleDocumentMouseUp, handleMouseDown, handlePlayPause, handleProgressClick } from "../lib/handlers";
+import { handleDocumentMouseMove, handleDocumentMouseUp, handleForward, handleMouseDown, handlePlayPause, handleProgressClick, handleRewind } from "../lib/handlers";
 import { IPlayerTools } from "../model/player-tools.interface";
 
 import styles from './styles.module.scss'
+import { getHHSStime } from "../utils/getHHSStime";
 
 export const PlayerTools: React.FC<IPlayerTools> = ({
     hls, 
@@ -15,6 +16,7 @@ export const PlayerTools: React.FC<IPlayerTools> = ({
 }) => {
     const [progress, setProgress] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
+    const [hoverTime, setHoverTime] = useState<number | null>(null);
     const progressContainerRef = useRef<HTMLDivElement>(null);
     const debounceRef = useRef<any>(null);
 
@@ -26,6 +28,7 @@ export const PlayerTools: React.FC<IPlayerTools> = ({
         const updateProgress = () => {
             if (duration > 0) {
                 const currentProgress = (video.currentTime / duration) * 100;
+                  
                 setProgress(currentProgress);
             }
         };
@@ -58,17 +61,51 @@ export const PlayerTools: React.FC<IPlayerTools> = ({
         };
     }, [isDragging, handleMouseMove, handleMouseUp]);
 
+    const handleMouseOverOnProgressBar = (e: any) => {
+        const progressBar = document.getElementById('progressBar')
+
+         const handleProgressBarMouseMove = (e: any) => {
+            if (!videoRef.current || !duration || !progressContainerRef.current) return;
+            
+            const progressContainer = progressContainerRef.current;
+            const rect = progressContainer.getBoundingClientRect();
+            
+            // Вычисляем позицию относительно прогресс-бара
+            const clickPosition = Math.min(Math.max(e.clientX - rect.left, 0), rect.width);
+            const clickPercentage = clickPosition / rect.width;
+            
+            const newTime = clickPercentage * duration;
+            
+            console.log('newTime - ', getHHSStime(Math.trunc(newTime) ));
+            
+
+            // Обновляем preview
+            // setProgress(newProgress);
+        };
+
+        progressBar?.addEventListener('mousemove', (e: any) => { handleProgressBarMouseMove(e) })
+    }
+
+    // const handleDeleteListenerProgressBar = () => {
+    //     const progressBar = document.getElementById('progressBar')
+    //     progressBar?.removeEventListener('mousemove', handleProgressBarMouseMove)
+    // }
+
     return (
         <div className={styles.toolsContainer}>
             <div className={styles.toolsWrapper}
                 onClick={(e) => e.stopPropagation()}
             >             
                 <div 
+                    id="progressBar"
                     ref={progressContainerRef}
-                    className={isVisibleTools ? styles.progressContainer : styles.progressContainer_hidden}
-                    // className={styles.progressContainer}
+                    // className={isVisibleTools ? styles.progressContainer : styles.progressContainer_hidden}
+                    className={styles.progressContainer}
                     onClick={(e: any) => { handleProgressClick(e, duration, setProgress, videoRef, progressContainerRef, debounceRef) }}
                     onMouseDown={(e: any) => { handleMouseDown(e, setIsDragging) }}
+                    onMouseOver={(e: any)=> {handleMouseOverOnProgressBar(e)}}
+                    // onMouseLeave={(e: any)=> {handleDeleteListenerProgressBar()}}
+
                 >
                     <div className={styles.progressBackground}></div>
                     <div 
@@ -80,17 +117,43 @@ export const PlayerTools: React.FC<IPlayerTools> = ({
                 <div className={isVisibleTools ? styles.toolsBackground : styles.toolsBackground_hidden}></div>
                 
                 <div className={styles.toolsArea}>
-                    <button 
-                        className={isVisibleTools ? styles.playBtn : styles.playBtn_hidden} 
-                        // className={styles.playBtn} 
-                        onClick={(e: any) => {
-                            e.stopPropagation()
-                            e.preventDefault()
-                            handlePlayPause(videoRef)
-                        }}
-                    >
-                        {videoRef.current?.paused ? "▶" : "⏸"}
-                    </button>
+                    <div className={styles.toolsBtns}>
+                        <button 
+                            // className={isVisibleTools ? styles.playBtn : styles.playBtn_hidden} 
+                            // className={styles.playBtn} 
+                            onClick={(e: any) => {
+                                handleRewind(videoRef, setProgress, duration)
+                            }}
+                        >
+                            назад на 2
+                        </button>
+                        
+                        <button 
+                            // className={isVisibleTools ? styles.playBtn : styles.playBtn_hidden} 
+                            className={styles.playBtn} 
+                            onClick={(e: any) => {
+                                e.stopPropagation()
+                                e.preventDefault()
+                                handlePlayPause(videoRef)
+                            }}
+                        >
+                            {videoRef.current?.paused ? "▶" : "⏸"}
+                        </button>
+                        
+                        <button 
+                            // className={isVisibleTools ? styles.playBtn : styles.playBtn_hidden} 
+                            // className={styles.playBtn} 
+                            onClick={(e: any) => {
+                                handleForward(videoRef, setProgress, duration)
+                            }}
+                        >
+                            вперед на 2
+                        </button>
+                    </div>
+                    <div className={styles.indicateTime}>
+                        {videoRef.current?.currentTime ? getHHSStime(Math.trunc(videoRef.current?.currentTime)) : '00:00'}
+                         / {getHHSStime(Math.trunc(duration))} 
+                    </div>
                 </div>
             </div>
         </div>

@@ -26,6 +26,14 @@ body {
     pointer-events: auto;
 }
 
+.toolsBtns {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    display: flex;
+    gap: 8%;
+}
+
 .playBtn {
     color: white;
     background: rgba(0, 0, 0, 0.5);
@@ -39,7 +47,7 @@ body {
     transition: all 0.2s ease;
     position: absolute;
     top: 30%;
-    left: 2%;
+    left: 8%;
     
     &:hover {
         background: rgba(0, 0, 0, 0.7);
@@ -51,7 +59,13 @@ body {
     }
 }
 
-
+.indicateTime {
+    position: absolute;
+    color: white;
+    height: 100%;
+    width: 100%;
+    left: 20%;
+}
 
 .toolsBackground {
     position: absolute;

@@ -6,8 +6,8 @@ import { useEffect, useRef, useState } from "react";
 import { VideoTag } from "@/widget/video-tag/ui/video-tag";
 
 const VIDEODATA = {
-  url: '/videos/output.m3u8',
-  duration: 7.388,
+  url: '/videos/test2/outTest2.m3u8',
+  duration: 85.333,
 }
 
 export default function Home() {
@@ -22,6 +22,7 @@ export default function Home() {
     if (Hls.isSupported() && videoRef.current) {
       hls.loadSource(VIDEODATA.url)
       hls.attachMedia(videoRef.current)
+      
     }
 
     // return (

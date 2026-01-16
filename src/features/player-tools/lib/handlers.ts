@@ -86,3 +86,19 @@ export const handleDocumentMouseUp = (e: MouseEvent, setIsDragging: any, videoRe
     // videoRef.current?.play()
 
 };
+
+export const handleForward = (videoRef: RefObject<any>, setProgress: any, duration: number) => {
+    if(videoRef.current) {
+        const newTime = videoRef.current?.currentTime + 2
+        videoRef.current.currentTime = newTime
+        setProgress(newTime / duration * 100) 
+    }
+}
+
+export  const handleRewind = (videoRef: RefObject<any>, setProgress: any, duration: number) => {
+        if(videoRef.current) {
+        const newTime = videoRef.current?.currentTime - 2
+        videoRef.current.currentTime = newTime
+        setProgress(newTime / duration * 100) 
+    }
+}
