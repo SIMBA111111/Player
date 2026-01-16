@@ -46,9 +46,9 @@ body {
         transform: scale(1.1);
     }
     
-    // &_hidden {
-    //     display: none;
-    // }
+    &_hidden {
+        display: none;
+    }
 }
 
 
@@ -62,12 +62,15 @@ body {
     background-color: rgba(112, 104, 104, 0.3);
     pointer-events: none;
     z-index: 5;
+
+    &_hidden {
+        display: none;
+    }
 }
 
 
 
 .progressContainer {
-
     &_hidden {
         display: none;
     }
@@ -136,7 +139,6 @@ body {
 
 
 .toolsArea {
-    background-color: rgba(112, 104, 104, 0.3);
     position: absolute;
     bottom: 0;
     width: 100%;

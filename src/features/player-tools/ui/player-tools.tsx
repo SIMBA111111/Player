@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useState, useRef } from "react";
-import { handlePlayPause } from "../lib/handlers";
+import { useEffect, useState, useRef, useCallback } from "react";
+import { handleDocumentMouseMove, handleDocumentMouseUp, handleMouseDown, handlePlayPause, handleProgressClick } from "../lib/handlers";
 import { IPlayerTools } from "../model/player-tools.interface";
 
 import styles from './styles.module.scss'
@@ -37,98 +37,26 @@ export const PlayerTools: React.FC<IPlayerTools> = ({
         };
     }, [videoRef, duration]);
 
+    const handleMouseMove = useCallback((e: MouseEvent) => {
+        handleDocumentMouseMove(e, duration, setProgress, videoRef, progressContainerRef, debounceRef);
+    }, [duration, videoRef]);
+
+    const handleMouseUp = useCallback((e: MouseEvent) => {
+        handleDocumentMouseUp(e, setIsDragging, videoRef, duration, progressContainerRef);
+    }, [duration, videoRef]);
+
     // Эффект для подписки на события мыши на document при перетаскивании
     useEffect(() => {
         if (!isDragging) return;
 
-        const handleDocumentMouseMove = (e: MouseEvent) => {
-            console.log('handleDocumentMouseMove');
-            
-            videoRef.current?.pause()
-            clearTimeout(debounceRef.current)
-
-            debounceRef.current = setTimeout(() => {
-
-                if (!videoRef.current || !duration || !progressContainerRef.current) return;
-                
-                const progressContainer = progressContainerRef.current;
-                const rect = progressContainer.getBoundingClientRect();
-                
-                // Вычисляем позицию относительно прогресс-бара
-                const clickPosition = Math.min(Math.max(e.clientX - rect.left, 0), rect.width);
-                const clickPercentage = clickPosition / rect.width;
-                
-                const newProgress = clickPercentage * 100;
-                
-                // Обновляем preview
-                setProgress(newProgress);
-
-            }, 8)
-        };
-
-        const handleDocumentMouseUp = (e: MouseEvent) => {
-            console.log('handleDocumentMouseUp');
-
-            if (!videoRef.current || !duration || !progressContainerRef.current) return;
-            
-            const progressContainer = progressContainerRef.current;
-            const rect = progressContainer.getBoundingClientRect();
-            
-            const clickPosition = Math.min(Math.max(e.clientX - rect.left, 0), rect.width);
-            const clickPercentage = clickPosition / rect.width;
-            
-            const newTime = clickPercentage * duration;
-            
-            // Перематываем видео
-            videoRef.current.currentTime = newTime;
-            
-            // Для HLS
-            // if (hls && videoRef.current.paused) {
-            //     hls.startLoad(newTime);
-            // }
-            
-            setIsDragging(false);
-            videoRef.current?.play()
-
-        };
-
-        // Подписываемся на события мыши на всем документе
-        document.addEventListener('mousemove', handleDocumentMouseMove, {passive: true});
-        document.addEventListener('mouseup', handleDocumentMouseUp, {passive: true});
+        document.addEventListener('mousemove', handleMouseMove, {passive: true});
+        document.addEventListener('mouseup', handleMouseUp, {passive: true});
 
         return () => {
-            document.removeEventListener('mousemove', handleDocumentMouseMove);
-            document.removeEventListener('mouseup', handleDocumentMouseUp);
+            document.removeEventListener('mousemove', handleMouseMove);
+            document.removeEventListener('mouseup', handleMouseUp);
         };
-    }, [isDragging, videoRef, duration]);
-
-    // Обработчик клика по прогресс-бару для перемотки
-    const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
-        console.log('handleProgressClick');
-        
-        if (!videoRef.current || !duration || !progressContainerRef.current) return;
-
-        const progressContainer = progressContainerRef.current;
-        const rect = progressContainer.getBoundingClientRect();
-        
-        const clickPosition = e.clientX - rect.left;
-        const containerWidth = rect.width;
-        const clickPercentage = clickPosition / containerWidth;
-        
-        const newTime = clickPercentage * duration;
-        
-        videoRef.current.currentTime = newTime;
-        
-        const newProgress = clickPercentage * 100;
-        setProgress(newProgress);
-    };
-
-    const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
-        console.log('handleMouseDown');
-        
-        e.preventDefault();
-        setIsDragging(true);
-    };
+    }, [isDragging, handleMouseMove, handleMouseUp]);
 
     return (
         <div className={styles.toolsContainer}>
@@ -137,10 +65,10 @@ export const PlayerTools: React.FC<IPlayerTools> = ({
             >             
                 <div 
                     ref={progressContainerRef}
-                    // className={isVisibleTools ? styles.progressContainer : styles.progressContainer_hidden}
-                    className={styles.progressContainer}
-                    onClick={handleProgressClick}
-                    onMouseDown={handleMouseDown}
+                    className={isVisibleTools ? styles.progressContainer : styles.progressContainer_hidden}
+                    // className={styles.progressContainer}
+                    onClick={(e: any) => { handleProgressClick(e, duration, setProgress, videoRef, progressContainerRef, debounceRef) }}
+                    onMouseDown={(e: any) => { handleMouseDown(e, setIsDragging) }}
                 >
                     <div className={styles.progressBackground}></div>
                     <div 
@@ -149,12 +77,12 @@ export const PlayerTools: React.FC<IPlayerTools> = ({
                     ></div>
                 </div>
                 
-                <div className={styles.toolsBackground}></div>
+                <div className={isVisibleTools ? styles.toolsBackground : styles.toolsBackground_hidden}></div>
                 
                 <div className={styles.toolsArea}>
                     <button 
-                        // className={isVisibleTools ? styles.playBtn : styles.playBtn_hidden} 
-                        className={styles.playBtn} 
+                        className={isVisibleTools ? styles.playBtn : styles.playBtn_hidden} 
+                        // className={styles.playBtn} 
                         onClick={(e: any) => {
                             e.stopPropagation()
                             e.preventDefault()
