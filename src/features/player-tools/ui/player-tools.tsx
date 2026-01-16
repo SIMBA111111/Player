@@ -42,6 +42,8 @@ export const PlayerTools: React.FC<IPlayerTools> = ({
         if (!isDragging) return;
 
         const handleDocumentMouseMove = (e: MouseEvent) => {
+            console.log('handleDocumentMouseMove');
+            
             videoRef.current?.pause()
             clearTimeout(debounceRef.current)
 
@@ -61,10 +63,12 @@ export const PlayerTools: React.FC<IPlayerTools> = ({
                 // Обновляем preview
                 setProgress(newProgress);
 
-            }, 5)
+            }, 8)
         };
 
         const handleDocumentMouseUp = (e: MouseEvent) => {
+            console.log('handleDocumentMouseUp');
+
             if (!videoRef.current || !duration || !progressContainerRef.current) return;
             
             const progressContainer = progressContainerRef.current;
@@ -100,6 +104,8 @@ export const PlayerTools: React.FC<IPlayerTools> = ({
 
     // Обработчик клика по прогресс-бару для перемотки
     const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>) => {
+        console.log('handleProgressClick');
+        
         if (!videoRef.current || !duration || !progressContainerRef.current) return;
 
         const progressContainer = progressContainerRef.current;
@@ -118,39 +124,49 @@ export const PlayerTools: React.FC<IPlayerTools> = ({
     };
 
     const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
+        console.log('handleMouseDown');
+        
         e.preventDefault();
         setIsDragging(true);
     };
 
     return (
-        <div className={styles.toolsContainer}>            
-            <div 
-                ref={progressContainerRef}
-                className={isVisibleTools ? styles.progressContainer : styles.progressContainer_hidden}
-                onClick={handleProgressClick}
-                onMouseDown={handleMouseDown}
-            >
-                {/* Фоновый слой прогресс-бара */}
-                <div className={styles.progressBackground}></div>
-                
-                {/* Заполненная часть прогресс-бара */}
+        <div className={styles.toolsContainer}>
+            <div className={styles.toolsWrapper}
+                onClick={(e) => e.stopPropagation()}
+            >             
                 <div 
-                    className={styles.progressFilled}
-                    style={{ width: `${progress}%` }}
-                ></div>
+                    ref={progressContainerRef}
+                    // className={isVisibleTools ? styles.progressContainer : styles.progressContainer_hidden}
+                    className={styles.progressContainer}
+                    onClick={handleProgressClick}
+                    onMouseDown={handleMouseDown}
+                >
+                    <div className={styles.progressBackground}></div>
+                    <div 
+                        className={styles.progressFilled}
+                        style={{ width: `${progress}%` }}
+                    ></div>
+                </div>
                 
-                {/* Ползунок (видим при наведении) */}
-                {/* <div 
-                    className={styles.progressThumb}
-                    style={{ left: `${progress + 1.5}%` }}
-                ></div> */}
+                {/* ФОН отдельно */}
+                <div className={styles.toolsBackground}></div>
+                
+                {/* Контент поверх фона */}
+                {/* <div className={styles.toolsArea}> */}
+                    <button 
+                        // className={isVisibleTools ? styles.playBtn : styles.playBtn_hidden} 
+                        className={styles.playBtn} 
+                        onClick={(e: any) => {
+                            e.stopPropagation()
+                            e.preventDefault()
+                            handlePlayPause(videoRef)
+                        }}
+                    >
+                        {videoRef.current?.paused ? "▶" : "⏸"}
+                    </button>
+                {/* </div> */}
             </div>
-            <button 
-                className={isVisibleTools ? styles.playBtn : styles.playBtn_hidden} 
-                onClick={() => handlePlayPause(videoRef)}
-            >
-                {videoRef.current?.paused ? "▶" : "⏸"}
-            </button>
         </div>
     );
 };

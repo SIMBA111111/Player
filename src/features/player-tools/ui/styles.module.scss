@@ -8,12 +8,27 @@ body {
     height: 100%;
     position: absolute;
     // background-color: gray;
-    // top: 40%;
-    // left: 50%;
+    top: 0;
+    left: 0;
     // height: 60px;
-    // display: flex;
-    // align-items: center;
-    // justify-content: center;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    align-items: center;
+    justify-content: center;
+}
+
+.toolsWrapper {
+    position: absolute;
+    // background-color: rgba(112, 104, 104, 0.3);
+    // pointer-events: none;
+    top: 85%;
+    left: -0;
+    width: 100%;
+    height: 15%;
+    cursor: pointer;
+    display: block;
+    pointer-events: auto;
 }
 
 .playBtn {
@@ -25,12 +40,11 @@ body {
     height: 50px;
     font-size: 18px;
     cursor: pointer;
-    z-index: 1000;
+    z-index: 50;
     transition: all 0.2s ease;
     position: absolute;
-    // top: ;
-    top: -8%;
-    left: 10px;
+    top: 30%;
+    left: 2%;
     // right: 0%;
     
     &:hover {
@@ -38,33 +52,22 @@ body {
         transform: scale(1.1);
     }
     
-    &_hidden {
-        display: none;
-    }
+    // &_hidden {
+    //     display: none;
+    // }
 }
 
 .progressContainer {
-    position: relative;
-    // bottom: 0;
-    // left: 0;
-    top: -11%;
-    left: 0;
-    width: 100%;
-    // height: 100%;
-    cursor: pointer;
-    display: flex;
-    // align-items: center;
-    // padding: 0 20px;
 
     &_hidden {
         display: none;
     }
     
     &:hover {
-        .progressThumb {
-            opacity: 1;
-            transform: translate(-50%, -50%) scale(1);
-        }
+        // .progressThumb {
+        //     opacity: 1;
+        //     transform: translate(-50%, -50%) scale(1);
+        // }
         
         .progressFilled {
             height: 15px;
@@ -79,11 +82,24 @@ body {
 .progressBackground {
     position: absolute;
     width: 100%;
-    // right: 10px;
     height: 10px;
     background-color: rgba(60, 255, 0, 0.3);
     border-radius: 2px;
     transition: height 0.2s ease;
+    &:hover {
+        // .progressThumb {
+        //     opacity: 1;
+        //     transform: translate(-50%, -50%) scale(1);
+        // }
+        
+        .progressFilled {
+            height: 15px;
+        }
+        
+        .progressBackground {
+            height: 15px;
+        }
+    }
 }
 
 .progressFilled {
@@ -92,6 +108,20 @@ body {
     background: linear-gradient(90deg, #ff0080, #ff2e00);
     border-radius: 2px;
     transition: width 0.1s linear, height 0.2s ease;
+    &:hover {
+        // .progressThumb {
+        //     opacity: 1;
+        //     transform: translate(-50%, -50%) scale(1);
+        // }
+        
+        .progressFilled {
+            height: 15px;
+        }
+        
+        .progressBackground {
+            height: 15px;
+        }
+    }
 }
 
 .progressThumb {
@@ -108,5 +138,34 @@ body {
     opacity: 0;
     transition: all 0.2s ease;
     pointer-events: none;
-    // z-index: 2;
+}
+
+// Создаем НОВЫЙ контейнер для фона
+.toolsBackground {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 90%;
+    background-color: rgba(112, 104, 104, 0.3);
+    pointer-events: none; // фон не кликабелен
+    z-index: 5;
+}
+
+.toolsArea {
+    background-color: rgba(112, 104, 104, 0.3);
+    position: absolute;
+    pointer-events: none;
+    bottom: 0;
+    width: 100%;
+    height: 88%;
+    display: flex;
+    align-self: flex-end;
+    justify-content: end;
+    align-items: end;
+    z-index: 50;
+
+        & * {
+        pointer-events: none; // Отключаем события для ВСЕХ детей
+    }   
 }

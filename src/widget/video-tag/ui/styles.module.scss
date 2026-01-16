@@ -1,13 +1,12 @@
 .playerContainer {
     position: relative;
-    // height: 300px;
     width: 1400px;
     cursor: pointer;
-    z-index: 10;
+    z-index: 1;
 
     &_hidden {
         position: relative;
-        // height: 300px;
+        z-index: 1;
         width: 1400px;
         cursor: none;
     }
@@ -16,5 +15,4 @@
 .video {
     height: 100%;
     width: 100%;
-    // position: absolute;
 }
