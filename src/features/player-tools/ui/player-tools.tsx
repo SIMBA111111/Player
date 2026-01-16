@@ -149,11 +149,9 @@ export const PlayerTools: React.FC<IPlayerTools> = ({
                     ></div>
                 </div>
                 
-                {/* ФОН отдельно */}
                 <div className={styles.toolsBackground}></div>
                 
-                {/* Контент поверх фона */}
-                {/* <div className={styles.toolsArea}> */}
+                <div className={styles.toolsArea}>
                     <button 
                         // className={isVisibleTools ? styles.playBtn : styles.playBtn_hidden} 
                         className={styles.playBtn} 
@@ -165,7 +163,7 @@ export const PlayerTools: React.FC<IPlayerTools> = ({
                     >
                         {videoRef.current?.paused ? "▶" : "⏸"}
                     </button>
-                {/* </div> */}
+                </div>
             </div>
         </div>
     );
