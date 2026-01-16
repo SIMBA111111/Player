@@ -1,5 +1,6 @@
 import { HlsEventEmitter } from "hls.js"
 import { RefObject } from "react"
+import { getHHSStime } from "../utils/getHHSStime"
 
 export const handlePlayPause = (videoRef: RefObject<HTMLVideoElement | null>) => {
   if (videoRef.current?.paused) {
@@ -101,4 +102,29 @@ export  const handleRewind = (videoRef: RefObject<any>, setProgress: any, durati
         videoRef.current.currentTime = newTime
         setProgress(newTime / duration * 100) 
     }
+}
+
+export const handleMouseOverOnProgressBar = (e: any, videoRef: RefObject<any>, duration: number, progressContainerRef: RefObject<any>, setHoverTime: any) => {
+    const progressBar = document.getElementById('progressBar')
+
+      const handleProgressBarMouseMove = (e: any) => {
+        if (!videoRef.current || !duration || !progressContainerRef.current) return;
+        
+        const progressContainer = progressContainerRef.current;
+        const rect = progressContainer.getBoundingClientRect();
+        
+        // Вычисляем позицию относительно прогресс-бара
+        const clickPosition = Math.min(Math.max(e.clientX - rect.left, 0), rect.width);
+        const clickPercentage = clickPosition / rect.width;
+        
+        const newTime = clickPercentage * duration;
+        
+        console.log('newTime - ', getHHSStime(Math.trunc(newTime) ));
+        setHoverTime(newTime)
+
+        // Обновляем preview
+        // setProgress(newProgress);
+    };
+
+    progressBar?.addEventListener('mousemove', (e: any) => { handleProgressBarMouseMove(e) })
 }

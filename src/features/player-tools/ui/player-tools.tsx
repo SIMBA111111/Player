@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, useRef, useCallback } from "react";
-import { handleDocumentMouseMove, handleDocumentMouseUp, handleForward, handleMouseDown, handlePlayPause, handleProgressClick, handleRewind } from "../lib/handlers";
+import { handleDocumentMouseMove, handleDocumentMouseUp, handleForward, handleMouseDown, handleMouseOverOnProgressBar, handlePlayPause, handleProgressClick, handleRewind } from "../lib/handlers";
 import { IPlayerTools } from "../model/player-tools.interface";
 
 import styles from './styles.module.scss'
@@ -16,7 +16,7 @@ export const PlayerTools: React.FC<IPlayerTools> = ({
 }) => {
     const [progress, setProgress] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
-    const [hoverTime, setHoverTime] = useState<number | null>(null);
+    const [hoverTime, setHoverTime] = useState<number>(0);
     const progressContainerRef = useRef<HTMLDivElement>(null);
     const debounceRef = useRef<any>(null);
 
@@ -28,7 +28,7 @@ export const PlayerTools: React.FC<IPlayerTools> = ({
         const updateProgress = () => {
             if (duration > 0) {
                 const currentProgress = (video.currentTime / duration) * 100;
-                  
+                setHoverTime(video.currentTime)
                 setProgress(currentProgress);
             }
         };
@@ -61,31 +61,6 @@ export const PlayerTools: React.FC<IPlayerTools> = ({
         };
     }, [isDragging, handleMouseMove, handleMouseUp]);
 
-    const handleMouseOverOnProgressBar = (e: any) => {
-        const progressBar = document.getElementById('progressBar')
-
-         const handleProgressBarMouseMove = (e: any) => {
-            if (!videoRef.current || !duration || !progressContainerRef.current) return;
-            
-            const progressContainer = progressContainerRef.current;
-            const rect = progressContainer.getBoundingClientRect();
-            
-            // Вычисляем позицию относительно прогресс-бара
-            const clickPosition = Math.min(Math.max(e.clientX - rect.left, 0), rect.width);
-            const clickPercentage = clickPosition / rect.width;
-            
-            const newTime = clickPercentage * duration;
-            
-            console.log('newTime - ', getHHSStime(Math.trunc(newTime) ));
-            
-
-            // Обновляем preview
-            // setProgress(newProgress);
-        };
-
-        progressBar?.addEventListener('mousemove', (e: any) => { handleProgressBarMouseMove(e) })
-    }
-
     // const handleDeleteListenerProgressBar = () => {
     //     const progressBar = document.getElementById('progressBar')
     //     progressBar?.removeEventListener('mousemove', handleProgressBarMouseMove)
@@ -103,7 +78,7 @@ export const PlayerTools: React.FC<IPlayerTools> = ({
                     className={styles.progressContainer}
                     onClick={(e: any) => { handleProgressClick(e, duration, setProgress, videoRef, progressContainerRef, debounceRef) }}
                     onMouseDown={(e: any) => { handleMouseDown(e, setIsDragging) }}
-                    onMouseOver={(e: any)=> {handleMouseOverOnProgressBar(e)}}
+                    onMouseOver={(e: any)=> {handleMouseOverOnProgressBar(e, videoRef, duration, progressContainerRef, setHoverTime)}}
                     // onMouseLeave={(e: any)=> {handleDeleteListenerProgressBar()}}
 
                 >
@@ -151,7 +126,7 @@ export const PlayerTools: React.FC<IPlayerTools> = ({
                         </button>
                     </div>
                     <div className={styles.indicateTime}>
-                        {videoRef.current?.currentTime ? getHHSStime(Math.trunc(videoRef.current?.currentTime)) : '00:00'}
+                        {videoRef.current?.currentTime ? getHHSStime(Math.trunc(hoverTime)) : '00:00'}
                          / {getHHSStime(Math.trunc(duration))} 
                     </div>
                 </div>
