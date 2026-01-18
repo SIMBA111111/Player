@@ -109,37 +109,37 @@ export const handleRewind = (videoRef: RefObject<any>, setProgress: any, duratio
 }
 
 
-export const handleProgressBarMouseMove = (e: any, videoRef: RefObject<any>, duration: number, progressContainerRef: RefObject<any>, setHoverTime: any ) => {
-    if (!videoRef.current || !duration || !progressContainerRef.current) return;
+// export const handleProgressBarMouseMove = (e: any, videoRef: RefObject<any>, duration: number, progressContainerRef: RefObject<any>, setHoverTime: any ) => {
+//     if (!videoRef.current || !duration || !progressContainerRef.current) return;
     
-    const timeHoverPosition = document.getElementById('timeHover')
+//     const timeHoverPosition = document.getElementById('timeHover')
     
-    const progressContainer = progressContainerRef.current;
-    const rect = progressContainer.getBoundingClientRect();
+//     const progressContainer = progressContainerRef.current;
+//     const rect = progressContainer.getBoundingClientRect();
     
-    // Вычисляем позицию относительно прогресс-бара
-    const clickPosition = Math.min(Math.max(e.clientX - rect.left, 0), rect.width);
+//     // Вычисляем позицию относительно прогресс-бара
+//     const clickPosition = Math.min(Math.max(e.clientX - rect.left, 0), rect.width);
 
-    const clickPercentage = clickPosition / rect.width;
+//     const clickPercentage = clickPosition / rect.width;
     
-    const newTime = clickPercentage * duration;
+//     const newTime = clickPercentage * duration;
 
-    if (timeHoverPosition && timeHoverPosition.style) {
-        console.log("&&&");
-        timeHoverPosition.style.left = `${String(clickPosition)}px`;
-    }
+//     if (timeHoverPosition && timeHoverPosition.style) {
+//         console.log("&&&");
+//         timeHoverPosition.style.left = `${String(clickPosition)}px`;
+//     }
     
-    // console.log('newTime - ', getHHSStime(Math.trunc(newTime) ));
-    setHoverTime(newTime)
+//     // console.log('newTime - ', getHHSStime(Math.trunc(newTime) ));
+//     setHoverTime(newTime)
 
-    // Обновляем preview
-    // setProgress(newProgress);
-};
+//     // Обновляем preview
+//     // setProgress(newProgress);
+// };
 
-export const handleMouseOverOnProgressBar = (e: any, videoRef: RefObject<any>, duration: number, progressContainerRef: RefObject<any>, setHoverTime: any) => {
-    const progressBar = document.getElementById('progressBar')
+// export const handleMouseOverOnProgressBar = (e: any, videoRef: RefObject<any>, duration: number, progressContainerRef: RefObject<any>, setHoverTime: any) => {
+//     const progressBar = document.getElementById('progressBar')
 
 
 
-    progressBar?.addEventListener('mousemove', (e: any) => { handleProgressBarMouseMove(e, videoRef, duration, progressContainerRef, setHoverTime) })
-}
+//     progressBar?.addEventListener('mousemove', (e: any) => { handleProgressBarMouseMove(e, videoRef, duration, progressContainerRef, setHoverTime) })
+// }

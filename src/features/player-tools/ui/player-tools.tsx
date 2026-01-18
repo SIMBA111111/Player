@@ -77,7 +77,7 @@ export const PlayerTools: React.FC<IPlayerTools> = ({
                     className={styles.progressContainer}
                     onClick={(e: any) => { handleProgressClick(e, duration, setProgress, videoRef, progressContainerRef, debounceRef) }}
                     onMouseDown={(e: any) => { handleMouseDown(e, setIsDragging) }}
-                    onMouseOver={(e: any)=> {handleMouseOverOnProgressBar(e, videoRef, duration, progressContainerRef, setHoverTime)}}
+                    // onMouseOver={(e: any)=> {handleMouseOverOnProgressBar(e, videoRef, duration, progressContainerRef, setHoverTime)}}
                     onMouseLeave={(e: any)=> {setHoverTime(0)}}
 
                 >
