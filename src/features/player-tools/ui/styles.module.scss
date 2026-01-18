@@ -82,7 +82,20 @@ body {
     }
 }
 
-
+.progressTimeHover {
+    position: absolute;
+    display: block;
+    top: -50px;
+    color: #fff;
+    background-color: red;
+    padding: 10 15 10 15;
+    width: 3%;
+    transform: translateX(-50%);
+    
+    &_hidden {
+        display: none;
+    }
+}
 
 .progressContainer {
     &_hidden {
