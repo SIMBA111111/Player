@@ -4,7 +4,7 @@ import { useEffect, useState, useRef, useCallback } from "react";
 
 import { ProgressBar } from '@/entites/progress-bar'
 
-import { handleForward, handlePlayPause, handleRewind } from "../lib/handlers";
+import { handleForward, handleMuteOnClick, handlePlayPause, handleRewind } from "../lib/handlers";
 import { IPlayerTools } from "../model/player-tools.interface";
 
 import styles from './styles.module.scss'
@@ -69,6 +69,10 @@ export const PlayerTools: React.FC<IPlayerTools> = ({
                         >
                             вперед на 2
                         </button>
+                    </div>
+
+                    <div className={styles.soundVolume}>
+                        <button onClick={(e: any) => handleMuteOnClick(videoRef)}>звук</button> 
                     </div>
                     <div className={styles.indicateTime}>
                         {videoRef.current?.currentTime ? getHHSStime(Math.trunc(videoRef.current.currentTime)) : '00:00'}

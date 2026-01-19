@@ -23,3 +23,7 @@ export const handleRewind = (videoRef: RefObject<any>, setProgress: any, duratio
         setProgress(newTime / duration * 100) 
     }
 }
+
+export const handleMuteOnClick = (videoRef: RefObject<any>) => {
+  videoRef.current.muted ? videoRef.current.volume = 1 : videoRef.current.volume = 0  
+}
