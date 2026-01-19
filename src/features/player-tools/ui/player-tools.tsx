@@ -25,6 +25,8 @@ export const PlayerTools: React.FC<IPlayerTools> = ({
 }) => {
     const [progress, setProgress] = useState(0);
 
+    // videoRef.current?.requestFullscreen
+
     return (
         <div className={styles.toolsContainer}>
             <div className={styles.toolsWrapper}
@@ -73,7 +75,7 @@ export const PlayerTools: React.FC<IPlayerTools> = ({
                         {videoRef.current?.currentTime ? getHHSStime(Math.trunc(videoRef.current.currentTime)) : '00:00'}
                          / {getHHSStime(Math.trunc(duration))} 
                     </div>
-                    <SettingsButtons/>
+                    <SettingsButtons videoRef={videoRef}/>
                 </div>
             </div>
         </div>

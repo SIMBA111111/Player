@@ -1,23 +1,21 @@
 'use client'
 
-import { useContext, useState } from 'react'
+import { RefObject, useContext, useState } from 'react'
 import styles from './styles.module.scss'
 import { Modal, ModalProvider } from '@/shared/ui'
 import { ModalContext } from '@/shared/ui/modal/modal'
 
 interface ISettingsButtons {
-
+    videoRef: RefObject<any>;
 }
 
-export const SettingsButtons: React.FC<ISettingsButtons> = () => {
+export const SettingsButtons: React.FC<ISettingsButtons> = ({videoRef}) => {
     const [settingsIsOpened, setSettingsIsOpened] = useState<boolean>(false) 
-    const [speedIsOpened, setSpeedIsOpened] = useState<boolean>(false) 
+    const [isFull, setisFull] = useState<boolean>(false) 
     const [qualityIsOpened, setQualityIsOpened] = useState<boolean>(false) 
 
     const modalContext = useContext(ModalContext)
 
-    console.log('modalContext = ', modalContext);
-    
 
     const handleOpenModal = () => {
         console.log('handleOpenModal');
@@ -25,6 +23,18 @@ export const SettingsButtons: React.FC<ISettingsButtons> = () => {
         setSettingsIsOpened(prev => !prev)
         modalContext?.setOpenedModal('settings')
         console.log("        modalContext?.setOpenedModal('settings')");
+    }
+
+    const handleOpenFullScreen = () => {
+        const playerContainer = document.getElementById('playerContainer')
+        
+        if (isFull) {
+            document?.exitFullscreen()    
+            setisFull(false)
+            return ''          
+        }
+        playerContainer?.requestFullscreen()
+        setisFull(true)
     }
 
     return (
@@ -52,7 +62,7 @@ export const SettingsButtons: React.FC<ISettingsButtons> = () => {
                     settings
                 </button>
             </div>
-            <button className={styles.fullScreen}>
+            <button className={styles.fullScreen} onClick={(e: any) => handleOpenFullScreen()}>
                 full screen
             </button>
         </div>

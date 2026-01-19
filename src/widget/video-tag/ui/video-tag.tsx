@@ -9,7 +9,7 @@ export const VideoTag: React.FC<IVideoTag> = ({hls, duration, hideToolsTimer, vi
 
     return (
         // <div className={isVisibleTools ? styles.playerContainer : styles.playerContainer_hidden} onClick={() => {handlePlayPause(videoRef)}} onMouseMove={() => {handleMouseMove()}} onMouseLeave={() => {handleMouseLeave()}} onMouseOver={()=>{handleMouseOver()}}>
-        <div className={styles.playerContainer} onClick={() => {handlePlayPause(videoRef)}} onMouseMove={() => {handleMouseMove()}} onMouseLeave={() => {handleMouseLeave()}} onMouseOver={()=>{handleMouseOver()}}>
+        <div id="playerContainer" className={styles.playerContainer} onClick={() => {handlePlayPause(videoRef)}} onMouseMove={() => {handleMouseMove()}} onMouseLeave={() => {handleMouseLeave()}} onMouseOver={()=>{handleMouseOver()}}>
             <video className={styles.video} id='video' ref={videoRef}></video>
             <PlayerTools hls={hls} duration={duration} videoRef={videoRef} isVisibleTools={isVisibleTools} setIsVisibleTools={setIsVisibleTools}/>
         </div>  
