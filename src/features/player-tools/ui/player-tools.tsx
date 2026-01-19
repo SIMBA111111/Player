@@ -9,6 +9,7 @@ import { IPlayerTools } from "../model/player-tools.interface";
 
 import styles from './styles.module.scss'
 import { getHHSStime } from "@/shared/utils/getHHSStime";
+import { SettingsButtons } from "@/entites/settings-buttons";
 
 interface BufferedFragment {
     start: number;
@@ -72,6 +73,7 @@ export const PlayerTools: React.FC<IPlayerTools> = ({
                         {videoRef.current?.currentTime ? getHHSStime(Math.trunc(videoRef.current.currentTime)) : '00:00'}
                          / {getHHSStime(Math.trunc(duration))} 
                     </div>
+                    <SettingsButtons/>
                 </div>
             </div>
         </div>

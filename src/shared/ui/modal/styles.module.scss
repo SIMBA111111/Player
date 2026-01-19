@@ -1,0 +1,25 @@
+.modalContainer {
+    display: block;
+    position: absolute;
+    bottom: 200%;
+    background-color: aqua;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+
+    &_hidden {
+        display: none;
+    }
+}
+
+.wrappedModal {
+    display: block;
+    position: absolute;
+    bottom: 200%;
+    display: flex;
+    flex-direction: column;
+
+    &_hidden {
+        display: none;
+    }
+}

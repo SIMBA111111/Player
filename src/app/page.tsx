@@ -18,16 +18,6 @@ export default function Home() {
   
   const hls = new Hls()
   
-
-  // console.log('hls.bufferedToEnd = ', hls.bufferedToEnd);
-  // console.log('hls.bufferingEnabled = ', hls.bufferingEnabled);
-  // console.log('hls.maxBufferLength = ', hls.maxBufferLength);
-  // console.log('hls.mainForwardBufferInfo = ', hls.mainForwardBufferInfo);
-  console.log('videoRef.current?.buffered = ', videoRef.current?.buffered);
-  console.log('videoRef.current?.buffered = ', videoRef.current?.buffered.end(0));
-  console.log('videoRef.current?.buffered = ', videoRef.current?.buffered.start(0));
-  
-
   useEffect(() =>{
     if (Hls.isSupported() && videoRef.current) {
       hls.loadSource(VIDEODATA.url)
