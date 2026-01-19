@@ -7,6 +7,11 @@ import { IPlayerTools } from "../model/player-tools.interface";
 import styles from './styles.module.scss'
 import { getHHSStime } from "../utils/getHHSStime";
 
+interface BufferedFragment {
+    start: number;
+    end: number;
+}
+
 export const PlayerTools: React.FC<IPlayerTools> = ({
     hls, 
     duration, 
@@ -17,6 +22,8 @@ export const PlayerTools: React.FC<IPlayerTools> = ({
     const [progress, setProgress] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
     const [hoverTime, setHoverTime] = useState<number>(0);
+    const [buffered, setBuffered] = useState<any>();
+    const [bufferedFragments, setBufferedFragments] = useState<BufferedFragment[]>([]);
     const progressContainerRef = useRef<HTMLDivElement>(null);
     const debounceRef = useRef<any>(null);
 
@@ -60,6 +67,39 @@ export const PlayerTools: React.FC<IPlayerTools> = ({
         };
     }, [isDragging, handleMouseMove, handleMouseUp]);
 
+    useEffect(() => {
+        if (!videoRef?.current) return;
+        
+        const videoElement = videoRef.current;
+        
+        const updateBufferedRanges = () => {
+            const fragments: BufferedFragment[] = [];
+            
+            // Собираем все буферизированные фрагменты
+            for (let index = 0; index < videoElement.buffered.length; index++) {
+                fragments.push({
+                    start: videoElement.buffered.start(index),
+                    end: videoElement.buffered.end(index)
+                });
+            }
+            
+            setBufferedFragments(fragments);
+        };
+        
+        // Initial update
+        updateBufferedRanges();
+        
+        videoElement.addEventListener('progress', updateBufferedRanges);
+        videoElement.addEventListener('loadeddata', updateBufferedRanges);
+        
+        return () => {
+            videoElement.removeEventListener('progress', updateBufferedRanges);
+            videoElement.removeEventListener('loadeddata', updateBufferedRanges);
+        };
+    }, [videoRef]);
+
+    console.log('buffered = ', buffered);
+
     return (
         <div className={styles.toolsContainer}>
             <div className={styles.toolsWrapper}
@@ -79,8 +119,26 @@ export const PlayerTools: React.FC<IPlayerTools> = ({
                     onMouseDown={(e: any) => { handleMouseDown(e, setIsDragging) }}
                     // onMouseOver={(e: any)=> {handleMouseOverOnProgressBar(e, videoRef, duration, progressContainerRef, setHoverTime)}}
                     onMouseLeave={(e: any)=> {setHoverTime(0)}}
+                    onMouseMove={(e: any)=> {handleMouseOverOnProgressBar(e, videoRef, duration, progressContainerRef, setHoverTime)}}
 
                 >
+                    {bufferedFragments.map((fragment, index) => {
+                        const startPercent = (fragment.start / duration) * 100;
+                        const widthPercent = ((fragment.end - fragment.start) / duration) * 100;
+                        
+                        return (
+                            <div 
+                                key={index}
+                                className={styles.progressBuffered}
+                                style={{
+                                    left: `${startPercent}%`,
+                                    width: `${widthPercent}%`,
+                                    position: 'absolute',
+                                }}
+                            ></div>
+                        );
+                    })}
+                    {/* <div id='progressBuffered' className={styles.progressBuffered}></div> */}
                     <div className={styles.progressBackground}></div>
                     <div 
                         className={styles.progressFilled}

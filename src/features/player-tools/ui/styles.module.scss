@@ -98,6 +98,7 @@ body {
 }
 
 .progressContainer {
+    width: 100%;
     &_hidden {
         display: none;
     }
@@ -136,7 +137,23 @@ body {
     height: 10px;
     background: linear-gradient(90deg, #ff0080, #ff2e00);
     border-radius: 2px;
-    transition: width 0.1s linear, height 0.2s ease;
+    &:hover {
+        .progressFilled {
+            height: 15px;
+        }
+        
+        .progressBackground {
+            height: 15px;
+        }
+    }
+}
+
+.progressBuffered {
+    position: absolute;
+    height: 10px;
+    background: linear-gradient(90deg, #ffffff, #ffffff);
+    border-radius: 2px;
+    // transition: width 0.1s linear, height 0.2s ease;
     &:hover {
         .progressFilled {
             height: 15px;

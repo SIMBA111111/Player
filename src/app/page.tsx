@@ -24,6 +24,8 @@ export default function Home() {
   // console.log('hls.maxBufferLength = ', hls.maxBufferLength);
   // console.log('hls.mainForwardBufferInfo = ', hls.mainForwardBufferInfo);
   console.log('videoRef.current?.buffered = ', videoRef.current?.buffered);
+  console.log('videoRef.current?.buffered = ', videoRef.current?.buffered.end(0));
+  console.log('videoRef.current?.buffered = ', videoRef.current?.buffered.start(0));
   
 
   useEffect(() =>{
