@@ -25,7 +25,6 @@ export const PlayerTools: React.FC<IPlayerTools> = ({
 }) => {
     const [progress, setProgress] = useState(0);
 
-    // videoRef.current?.requestFullscreen
 
     return (
         <div className={styles.toolsContainer}>
