@@ -15,19 +15,21 @@
 
 .progressContainer {
     width: 100%;
+    cursor: pointer;
+
     &_hidden {
         display: none;
     }
     
-    &:hover {
-        .progressFilled {
-            height: 15px;
-        }
+    // &:hover {
+    //     .progressFilled {
+    //         height: 15px;
+    //     }
         
-        .progressBackground {
-            height: 15px;
-        }
-    }
+    //     .progressBackground {
+    //         height: 15px;
+    //     }
+    // }
 }
 
 .progressBackground {

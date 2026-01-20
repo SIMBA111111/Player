@@ -7,23 +7,3 @@ export const handlePlayPause = (videoRef: RefObject<HTMLVideoElement | null>) =>
     videoRef.current?.pause()
   }
 }
-
-export const handleForward = (videoRef: RefObject<any>, setProgress: any, duration: number) => {
-    if(videoRef.current) {
-        const newTime = videoRef.current?.currentTime + 2
-        videoRef.current.currentTime = newTime
-        setProgress(newTime / duration * 100) 
-    }
-}
-
-export const handleRewind = (videoRef: RefObject<any>, setProgress: any, duration: number) => {
-        if(videoRef.current) {
-        const newTime = videoRef.current?.currentTime - 2
-        videoRef.current.currentTime = newTime
-        setProgress(newTime / duration * 100) 
-    }
-}
-
-export const handleMuteOnClick = (videoRef: RefObject<any>) => {
-  videoRef.current.muted ? videoRef.current.volume = 1 : videoRef.current.volume = 0  
-}

@@ -11,10 +11,8 @@ const VIDEODATA = {
 }
 
 export default function Home() {
-  const [isVisibleTools, setIsVisibleTools] = useState(false)
 
   const videoRef = useRef<HTMLVideoElement>(null)
-  const hideToolsTimer = useRef<any>(null)
   
   const hls = new Hls({startLevel: 2})
 
@@ -69,6 +67,6 @@ export default function Home() {
   })
 
   return (
-    <VideoTag hls={hls} duration={VIDEODATA.duration} videoRef={videoRef} hideToolsTimer={hideToolsTimer} isVisibleTools={isVisibleTools} setIsVisibleTools={setIsVisibleTools}/>
+    <VideoTag hls={hls} duration={VIDEODATA.duration} videoRef={videoRef}/>
   );
 }

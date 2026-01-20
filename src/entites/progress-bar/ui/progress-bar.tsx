@@ -11,8 +11,6 @@ import styles from './styles.module.scss'
 interface IProgressBar {
     duration: number;
     videoRef: RefObject<any>;
-    // hoverTime: number;
-    // setHoverTime: (time: number) => void;
     progress: number;
     setProgress: (progress: number) => void;
     isVisibleTools: boolean;
@@ -113,7 +111,6 @@ export const ProgressBar: React.FC<IProgressBar> = ({duration, videoRef, progres
                 className={styles.progressContainer}
                 onClick={(e: any) => { handleProgressClick(e, duration, setProgress, videoRef, progressContainerRef, debounceRef) }}
                 onMouseDown={(e: any) => { handleMouseDown(e, setIsDragging) }}
-                // onMouseOver={(e: any)=> {handleMouseOverOnProgressBar(e, videoRef, duration, progressContainerRef, setHoverTime)}}
                 onMouseLeave={(e: any)=> {setHoverTime(0)}}
                 onMouseMove={(e: any)=> {handleMouseOverOnProgressBar(e, videoRef, duration, progressContainerRef, setHoverTime)}}
 

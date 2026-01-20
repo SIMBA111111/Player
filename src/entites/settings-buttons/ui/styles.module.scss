@@ -4,6 +4,10 @@
     position: absolute;
     top: 40%;
     right: 3%;
+
+    &_hidden {
+        display: none;
+    }
 }
 
 .settingsOptions {

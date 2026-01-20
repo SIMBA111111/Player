@@ -1,18 +1,21 @@
 'use client'
 
 import { RefObject, useContext, useState } from 'react'
-import styles from './styles.module.scss'
+
 import { Modal, ModalProvider } from '@/shared/ui'
 import { ModalContext } from '@/shared/ui/modal/modal'
+
 import { handleChangeVideoSpeed } from '../lib/handlers'
 
+import styles from './styles.module.scss'
 interface ISettingsButtons {
     videoRef: RefObject<any>;
+    isVisibleTools: boolean;
 }
 
 type ModalType = 'settings' | 'quality' | 'speed' | null;
 
-export const SettingsButtons: React.FC<ISettingsButtons> = ({videoRef}) => {
+export const SettingsButtons: React.FC<ISettingsButtons> = ({videoRef, isVisibleTools}) => {
     const [settingsIsOpened, setSettingsIsOpened] = useState<boolean>(false) 
     const [isFull, setisFull] = useState<boolean>(false) 
     const [qualityIsOpened, setQualityIsOpened] = useState<boolean>(false) 
@@ -64,6 +67,7 @@ export const SettingsButtons: React.FC<ISettingsButtons> = ({videoRef}) => {
     }
 
     return (
+        // <div className={isVisibleTools ? styles.settingsContainer : styles.settingsContainer_hidden}>
         <div className={styles.settingsContainer}>
             <div className={styles.settingsWrapper}>
                 {/* Кнопка открытия */}

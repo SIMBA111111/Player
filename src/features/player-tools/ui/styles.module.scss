@@ -1,5 +1,5 @@
 body {
-    margin: 0;
+    margin: 20;
 }
 
 .toolsContainer {
@@ -21,50 +21,9 @@ body {
     left: -0;
     width: 100%;
     height: 15%;
-    cursor: pointer;
+    // cursor: pointer;
     display: block;
     pointer-events: auto;
-}
-
-.toolsBtns {
-    position: absolute;
-    height: 100%;
-    width: 100%;
-    display: flex;
-    gap: 8%;
-}
-
-.playBtn {
-    color: white;
-    background: rgba(0, 0, 0, 0.5);
-    border: 2px solid white;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    font-size: 18px;
-    cursor: pointer;
-    z-index: 50;
-    transition: all 0.2s ease;
-    position: absolute;
-    top: 30%;
-    left: 8%;
-    
-    &:hover {
-        background: rgba(0, 0, 0, 0.7);
-        transform: scale(1.1);
-    }
-    
-    &_hidden {
-        display: none;
-    }
-}
-
-.indicateTime {
-    position: absolute;
-    color: white;
-    height: 100%;
-    width: 100%;
-    left: 20%;
 }
 
 .toolsBackground {
@@ -73,7 +32,7 @@ body {
     left: 0;
     width: 100%;
     height: 92%;
-    background-color: rgba(112, 104, 104, 0.3);
+    background-color: rgba(255, 255, 255, 0.7);
     pointer-events: none;
     z-index: 5;
 
@@ -81,106 +40,6 @@ body {
         display: none;
     }
 }
-
-.progressTimeHover {
-    position: absolute;
-    display: block;
-    top: -50px;
-    color: #fff;
-    background-color: red;
-    padding: 10 15 10 15;
-    width: 3%;
-    transform: translateX(-50%);
-    
-    &_hidden {
-        display: none;
-    }
-}
-
-.progressContainer {
-    width: 100%;
-    &_hidden {
-        display: none;
-    }
-    
-    &:hover {
-        .progressFilled {
-            height: 15px;
-        }
-        
-        .progressBackground {
-            height: 15px;
-        }
-    }
-}
-
-.progressBackground {
-    position: absolute;
-    width: 100%;
-    height: 10px;
-    background-color: rgba(60, 255, 0, 0.3);
-    border-radius: 2px;
-    transition: height 0.2s ease;
-    &:hover {
-        .progressFilled {
-            height: 15px;
-        }
-        
-        .progressBackground {
-            height: 15px;
-        }
-    }
-}
-
-.progressFilled {
-    position: absolute;
-    height: 10px;
-    background: linear-gradient(90deg, #ff0080, #ff2e00);
-    border-radius: 2px;
-    &:hover {
-        .progressFilled {
-            height: 15px;
-        }
-        
-        .progressBackground {
-            height: 15px;
-        }
-    }
-}
-
-.progressBuffered {
-    position: absolute;
-    height: 10px;
-    background: linear-gradient(90deg, #ffffff, #ffffff);
-    border-radius: 2px;
-    // transition: width 0.1s linear, height 0.2s ease;
-    &:hover {
-        .progressFilled {
-            height: 15px;
-        }
-        
-        .progressBackground {
-            height: 15px;
-        }
-    }
-}
-
-.progressThumb {
-    position: absolute;
-    margin-top: 7px;
-    margin-left: -10px;
-    top: 90%;
-    transform: translate(-50%, -50%) scale(0);
-    width: 30px;
-    height: 30px;
-    background: white;
-    border-radius: 50%;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    opacity: 0;
-    transition: all 0.2s ease;
-    pointer-events: none;
-}
-
 
 .toolsArea {
     position: absolute;
@@ -192,4 +51,18 @@ body {
     justify-content: end;
     align-items: end;
     z-index: 50;
+}
+
+.indicateTime {
+    position: absolute;
+    color: rgb(0, 0, 0);
+    font-size: 20px;
+    height: 60%;
+    width: 100%;
+    left: 21%;
+    font-weight: 600;
+
+    &_hidden {
+        display: none;
+    }
 }

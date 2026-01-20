@@ -1,0 +1,32 @@
+.soundContainer {
+    width: 10%;
+    height: 35%;
+    position: absolute;
+    top: 35%;
+    left: 16%;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+
+    &_hidden {
+        display: none;
+    }
+}
+
+.soundBtn {
+    // position: absolute;
+    background: none;
+    border: none;
+    outline: none;
+    cursor: pointer;
+}
+
+.soundVolumeBackground {
+    // position: absolute;
+    width: 80%;
+    height: 5px;
+    background-color: red;
+}
