@@ -1,10 +1,12 @@
 import { RefObject } from "react"
 
-export const handlePlayPause = (videoRef: RefObject<HTMLVideoElement | null>) => {
+export const handlePlayPause = (videoRef: RefObject<HTMLVideoElement | null>, setPaused: (paused: boolean) => void) => {
   if (videoRef.current?.paused) {
     videoRef.current?.play()
+    setPaused(false)
   } else {
     videoRef.current?.pause()
+    setPaused(true)
   }
 }
 

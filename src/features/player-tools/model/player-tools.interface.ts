@@ -7,4 +7,6 @@ export interface IPlayerTools {
     videoRef: RefObject<HTMLVideoElement | null>
     isVisibleTools: boolean
     setIsVisibleTools: (isVisible: boolean) => void
+    paused: boolean;
+    setPaused: (paused: boolean) => void
 }

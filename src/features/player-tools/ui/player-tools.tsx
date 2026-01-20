@@ -6,7 +6,7 @@ import { ProgressBar } from '@/entites/progress-bar'
 import { getHHSStime } from "@/shared/utils/getHHSStime";
 import { SettingsButtons } from "@/entites/settings-buttons";
 import { PlayButtons } from "@/entites/play-buttons";
-import { SoundVolume } from "@/entites/sound-volume";
+import { SoundAndTimeVolume } from "@/entites/sound-volume";
 
 import { IPlayerTools } from "../model/player-tools.interface";
 
@@ -22,7 +22,9 @@ export const PlayerTools: React.FC<IPlayerTools> = ({
     duration, 
     videoRef, 
     isVisibleTools, 
-    setIsVisibleTools
+    setIsVisibleTools,
+    paused,
+    setPaused
 }) => {
     const [progress, setProgress] = useState(0);
 
@@ -39,15 +41,15 @@ export const PlayerTools: React.FC<IPlayerTools> = ({
                 
                 <div className={styles.toolsArea}>
 
-                    <PlayButtons videoRef={videoRef} duration={duration} isVisibleTools={isVisibleTools} setProgress={setProgress}/>
+                    <PlayButtons videoRef={videoRef} duration={duration} isVisibleTools={isVisibleTools} paused={paused} setPaused={setPaused} setProgress={setProgress}/>
 
-                    <SoundVolume videoRef={videoRef} isVisibleTools={isVisibleTools}/>
+                    <SoundAndTimeVolume videoRef={videoRef} isVisibleTools={isVisibleTools} duration={duration}/>
 
                     {/* <div className={isVisibleTools ? styles.indicateTime : styles.indicateTime_hidden}> */}
-                    <div className={styles.indicateTime}>
+                    {/* <div className={styles.indicateTime}>
                         {videoRef.current?.currentTime ? getHHSStime(Math.trunc(videoRef.current.currentTime)) : '00:00'}
                          / {getHHSStime(Math.trunc(duration))} 
-                    </div>
+                    </div> */}
 
                     <SettingsButtons videoRef={videoRef} isVisibleTools={isVisibleTools}/>
                 </div>

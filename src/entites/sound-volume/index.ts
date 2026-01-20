@@ -1,1 +1,1 @@
-export { SoundVolume } from './ui/sound-volume'
+export { SoundAndTimeVolume } from './ui/sound-volume'
