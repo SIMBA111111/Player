@@ -25,7 +25,6 @@ export const PlayerTools: React.FC<IPlayerTools> = ({
 }) => {
     const [progress, setProgress] = useState(0);
 
-
     return (
         <div className={styles.toolsContainer}>
             <div className={styles.toolsWrapper}
