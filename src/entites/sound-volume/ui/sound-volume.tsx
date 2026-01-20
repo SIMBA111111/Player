@@ -1,7 +1,7 @@
 "use client"
 
 import React, { RefObject, useEffect, useState } from 'react'
-import { handleMuteOnClick } from '../lib/handlers'
+import { handleMouseClickSoundBtn, handleMuteOnClick } from '../lib/handlers'
 
 import styles from './styles.module.scss'
 import { getHHSStime } from '@/shared/utils/getHHSStime'
@@ -43,58 +43,58 @@ export const SoundAndTimeVolume: React.FC<ISoundVolume> = ({videoRef, isVisibleT
 
     if(!videoRef.current) return 
     
-    const handleMouseOverSoundBtn = () => {
-        setIsVisibleSoundBar(true)
-    }
+    // const handleMouseOverSoundBtn = () => {
+    //     setIsVisibleSoundBar(true)
+    // }
 
-    const handleMouseLeaveSoundBtn = () => {
-        setIsVisibleSoundBar(false)
-    }
+    // const handleMouseLeaveSoundBtn = () => {
+    //     setIsVisibleSoundBar(false)
+    // }
 
-    const handleMouseClickSoundBtn = (e: any) => {
-        const soundVolumeBackgroundBar = document.getElementById('soundVolumeBackground')
+    // const handleMouseClickSoundBtn = (e: any) => {
+    //     const soundVolumeBackgroundBar = document.getElementById('soundVolumeBackground')
         
-        if(!soundVolumeBackgroundBar || !videoRef.current) return 
+    //     if(!soundVolumeBackgroundBar || !videoRef.current) return 
 
-        const positionOfSoundBar = soundVolumeBackgroundBar.getBoundingClientRect()
+    //     const positionOfSoundBar = soundVolumeBackgroundBar.getBoundingClientRect()
 
-        const positionOfNewVolume = (e.clientX - positionOfSoundBar?.left) / positionOfSoundBar.width
+    //     const positionOfNewVolume = (e.clientX - positionOfSoundBar?.left) / positionOfSoundBar.width
 
-        videoRef.current.volume = Math.trunc(positionOfNewVolume * 10) / 10
+    //     videoRef.current.volume = Math.trunc(positionOfNewVolume * 10) / 10
 
-        setCurrentVolume(Math.trunc(positionOfNewVolume * 100))
-    }
+    //     setCurrentVolume(Math.trunc(positionOfNewVolume * 100))
+    // }
 
-    const handleMouseDownSoundBtn = () => {
-        setIsDraggingVolume(true)
-    }
+    // const handleMouseDownSoundBtn = () => {
+    //     setIsDraggingVolume(true)
+    // }
 
-    const handleMouseMoveSoundBtn = (e: any) => {
-        if(!isDraggingVolume) return
+    // const handleMouseMoveSoundBtn = (e: any) => {
+    //     if(!isDraggingVolume) return
 
-        const soundVolumeBackgroundBar = document.getElementById('soundVolumeBackground')
-        const positionOfSoundBar = soundVolumeBackgroundBar?.getBoundingClientRect()
+    //     const soundVolumeBackgroundBar = document.getElementById('soundVolumeBackground')
+    //     const positionOfSoundBar = soundVolumeBackgroundBar?.getBoundingClientRect()
         
-        if(!positionOfSoundBar) return
+    //     if(!positionOfSoundBar) return
 
-        const newCurrentVolume = (e.clientX - positionOfSoundBar.left) / positionOfSoundBar.width * 100
+    //     const newCurrentVolume = (e.clientX - positionOfSoundBar.left) / positionOfSoundBar.width * 100
 
-        setCurrentVolume(newCurrentVolume)
-    }
+    //     setCurrentVolume(newCurrentVolume)
+    // }
 
-    const handleMouseUpSoundBtn = () => {
-        setIsDraggingVolume(false)
-    }
+    // const handleMouseUpSoundBtn = () => {
+    //     setIsDraggingVolume(false)
+    // }
 
     return (
         // <div className={isVisibleTools ? styles.soundVolume : styles.soundVolume_hidden}>
         <div className={styles.soundAndTimeContainer}>
             <div className={isVisibleSoundBar ? styles.soundContainer : styles.soundContainer_hidden} onMouseOver={(e: any) => handleMouseOverSoundBtn()} onMouseLeave={(e: any) => handleMouseLeaveSoundBtn()}>
-                <button className={styles.soundBtn} onClick={(e: any) => handleMuteOnClick(videoRef)}>
+                <button className={styles.soundBtn} onClick={(e: any) => handleMuteOnClick(videoRef, setCurrentVolume)}>
                     <img src="/images/png/sound.png" alt="" height={30}/>    
                 </button> 
                 <div id='soundVolumeBackground' className={isVisibleSoundBar ? styles.soundVolumeBackground : styles.soundVolumeBackground_hidden} 
-                    onClick={(e: any) => handleMouseClickSoundBtn(e)}
+                    onClick={(e: any) => handleMouseClickSoundBtn(e, videoRef, setCurrentVolume)}
                     onMouseMove={(e: any) => handleMouseMoveSoundBtn(e)}
                     onMouseDown={(e: any) => handleMouseDownSoundBtn()}
                     onMouseUp={(e: any) => handleMouseUpSoundBtn()}
