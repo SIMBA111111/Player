@@ -1,10 +1,15 @@
 "use client"
 
 import React, { RefObject, useEffect, useState } from 'react'
-import { handleMouseClickSoundBtn, handleMuteOnClick } from '../lib/handlers'
-
-import styles from './styles.module.scss'
+import { 
+    handleMouseClickSoundBtn, 
+    handleMouseDownSoundBtn, 
+    handleMouseUpSoundBtn, 
+    handleMouseMoveSoundBtn, 
+    handleMuteOnClick 
+} from '../lib/handlers'
 import { getHHSStime } from '@/shared/utils/getHHSStime'
+import styles from './styles.module.scss'
 
 interface ISoundVolume {
     videoRef: RefObject<HTMLVideoElement | null>
@@ -16,95 +21,109 @@ export const SoundAndTimeVolume: React.FC<ISoundVolume> = ({videoRef, isVisibleT
     const [isVisibleSoundBar, setIsVisibleSoundBar] = useState<boolean>(false)
     const [currentVolume, setCurrentVolume] = useState<number>(50)
     const [isDraggingVolume, setIsDraggingVolume] = useState<boolean>(false)
-    const [currentTime, setCurrentTime] = useState<number>(0) // ← Добавляем состояние для времени
+    const [currentTime, setCurrentTime] = useState<number>(0)
 
-
+    // Обновление времени видео
     useEffect(() => {
         if (!videoRef.current) return
 
         const video = videoRef.current
         
-        // Обработчик обновления времени
         const handleTimeUpdate = () => {
             setCurrentTime(video.currentTime)
         }
         
-        // Подписываемся на событие timeupdate
         video.addEventListener('timeupdate', handleTimeUpdate)
-        
-        // Инициализируем начальное время
         setCurrentTime(video.currentTime)
         
-        // Отписываемся при размонтировании
         return () => {
             video.removeEventListener('timeupdate', handleTimeUpdate)
         }
     }, [videoRef])
 
-    if(!videoRef.current) return 
-    
-    // const handleMouseOverSoundBtn = () => {
-    //     setIsVisibleSoundBar(true)
-    // }
+    // Глобальные обработчики для перетаскивания
+    useEffect(() => {
+        const handleGlobalMouseUp = () => {
+            if (isDraggingVolume) {
+                setIsDraggingVolume(false)
+            }
+        }
 
-    // const handleMouseLeaveSoundBtn = () => {
-    //     setIsVisibleSoundBar(false)
-    // }
+        const handleGlobalMouseMove = (e: MouseEvent) => {
+            if (isDraggingVolume && videoRef.current) {
+                const soundVolumeBackgroundBar = document.getElementById('soundVolumeBackground')
+                if (!soundVolumeBackgroundBar) return
 
-    // const handleMouseClickSoundBtn = (e: any) => {
-    //     const soundVolumeBackgroundBar = document.getElementById('soundVolumeBackground')
-        
-    //     if(!soundVolumeBackgroundBar || !videoRef.current) return 
+                const positionOfSoundBar = soundVolumeBackgroundBar.getBoundingClientRect()
+                
+                let newCurrentVolume = ((e.clientX - positionOfSoundBar.left) / positionOfSoundBar.width) * 100
+                newCurrentVolume = Math.max(0, Math.min(100, newCurrentVolume))
+                
+                setCurrentVolume(newCurrentVolume)
+                videoRef.current.volume = newCurrentVolume / 100
+            }
+        }
 
-    //     const positionOfSoundBar = soundVolumeBackgroundBar.getBoundingClientRect()
+        window.addEventListener('mouseup', handleGlobalMouseUp)
+        window.addEventListener('mousemove', handleGlobalMouseMove)
 
-    //     const positionOfNewVolume = (e.clientX - positionOfSoundBar?.left) / positionOfSoundBar.width
+        return () => {
+            window.removeEventListener('mouseup', handleGlobalMouseUp)
+            window.removeEventListener('mousemove', handleGlobalMouseMove)
+        }
+    }, [isDraggingVolume, videoRef])
 
-    //     videoRef.current.volume = Math.trunc(positionOfNewVolume * 10) / 10
-
-    //     setCurrentVolume(Math.trunc(positionOfNewVolume * 100))
-    // }
-
-    // const handleMouseDownSoundBtn = () => {
-    //     setIsDraggingVolume(true)
-    // }
-
-    // const handleMouseMoveSoundBtn = (e: any) => {
-    //     if(!isDraggingVolume) return
-
-    //     const soundVolumeBackgroundBar = document.getElementById('soundVolumeBackground')
-    //     const positionOfSoundBar = soundVolumeBackgroundBar?.getBoundingClientRect()
-        
-    //     if(!positionOfSoundBar) return
-
-    //     const newCurrentVolume = (e.clientX - positionOfSoundBar.left) / positionOfSoundBar.width * 100
-
-    //     setCurrentVolume(newCurrentVolume)
-    // }
-
-    // const handleMouseUpSoundBtn = () => {
-    //     setIsDraggingVolume(false)
-    // }
+    if(!videoRef.current) return null
 
     return (
-        // <div className={isVisibleTools ? styles.soundVolume : styles.soundVolume_hidden}>
+        // <div className={isVisibleTools ? styles.soundAndTimeContainer : styles.soundAndTimeContainer_hidden}>
         <div className={styles.soundAndTimeContainer}>
-            <div className={isVisibleSoundBar ? styles.soundContainer : styles.soundContainer_hidden} onMouseOver={(e: any) => handleMouseOverSoundBtn()} onMouseLeave={(e: any) => handleMouseLeaveSoundBtn()}>
-                <button className={styles.soundBtn} onClick={(e: any) => handleMuteOnClick(videoRef, setCurrentVolume)}>
-                    <img src="/images/png/sound.png" alt="" height={30}/>    
-                </button> 
-                <div id='soundVolumeBackground' className={isVisibleSoundBar ? styles.soundVolumeBackground : styles.soundVolumeBackground_hidden} 
-                    onClick={(e: any) => handleMouseClickSoundBtn(e, videoRef, setCurrentVolume)}
-                    onMouseMove={(e: any) => handleMouseMoveSoundBtn(e)}
-                    onMouseDown={(e: any) => handleMouseDownSoundBtn()}
-                    onMouseUp={(e: any) => handleMouseUpSoundBtn()}
+            <div className={isVisibleSoundBar ? styles.soundContainer : styles.soundContainer_hidden} 
+                onMouseEnter={() => setIsVisibleSoundBar(true)}
+                onMouseLeave={() => {
+                    if (!isDraggingVolume) {
+                        setIsVisibleSoundBar(false)
+                    }
+                }}
+            >
+                <button 
+                    className={styles.soundBtn} 
+                    onClick={() => handleMuteOnClick(videoRef, setCurrentVolume)}
                 >
-                    <div id='filledSoundBar' className={styles.soundVolumeFilled} style={{width: `${currentVolume}%`}}/>
+                    <img src="/images/png/sound.png" alt="Sound" height={30}/>    
+                </button> 
+                
+                <div 
+                    id='soundVolumeBackground' 
+                    className={isVisibleSoundBar ? styles.soundVolumeBackground : styles.soundVolumeBackground_hidden} 
+                    onClick={(e) => handleMouseClickSoundBtn(e, videoRef, setCurrentVolume)}
+                    onMouseDown={(e) => handleMouseDownSoundBtn(setIsDraggingVolume)}
+                    onMouseUp={(e) => handleMouseUpSoundBtn(setIsDraggingVolume)}
+                    onMouseMove={(e) => handleMouseMoveSoundBtn(e, isDraggingVolume, setCurrentVolume, videoRef)}
+                >
+                    <div 
+                        id='filledSoundBar' 
+                        className={styles.soundVolumeFilled} 
+                        style={{width: `${currentVolume}%`}}
+                    >
+                        <div 
+                            className={isVisibleSoundBar ? styles.pointer : styles.pointer_hidden}
+                            onMouseDown={(e) => {
+                                e.stopPropagation()
+                                handleMouseDownSoundBtn(setIsDraggingVolume)
+                            }}
+                            onMouseUp={(e) => {
+                                e.stopPropagation()
+                                handleMouseUpSoundBtn(setIsDraggingVolume)
+                            }}
+                        ></div>
+                    </div>
                 </div>
             </div>
+            
             <div className={styles.indicateTime}>
-                {videoRef.current?.currentTime ? getHHSStime(Math.trunc(videoRef.current.currentTime)) : '00:00'} / {getHHSStime(Math.trunc(duration))} 
+                {getHHSStime(Math.trunc(currentTime))} / {getHHSStime(Math.trunc(duration))} 
             </div>
         </div>
     )
-} 
+}

@@ -26,10 +26,9 @@ export const ProgressBar: React.FC<IProgressBar> = ({duration, videoRef, progres
     const [isDragging, setIsDragging] = useState(false);
     const [bufferedFragments, setBufferedFragments] = useState<IBufferedFragment[]>([]);
     const progressContainerRef = useRef<HTMLDivElement>(null);
-    const debounceRef = useRef<any>(null);
 
     const handleMouseMove = useCallback((e: MouseEvent) => {
-        handleDocumentMouseMove(e, duration, setProgress, setHoverTime, videoRef, progressContainerRef, debounceRef);
+        handleDocumentMouseMove(e, duration, setProgress, setHoverTime, videoRef, progressContainerRef);
     }, [duration, videoRef]);
 
     const handleMouseUp = useCallback((e: MouseEvent) => {
@@ -109,7 +108,7 @@ export const ProgressBar: React.FC<IProgressBar> = ({duration, videoRef, progres
                 ref={progressContainerRef}
                 // className={isVisibleTools ? styles.progressContainer : styles.progressContainer_hidden}
                 className={styles.progressContainer}
-                onClick={(e: any) => { handleProgressClick(e, duration, setProgress, videoRef, progressContainerRef, debounceRef) }}
+                onClick={(e: any) => { handleProgressClick(e, duration, setProgress, videoRef, progressContainerRef) }}
                 onMouseDown={(e: any) => { handleMouseDown(e, setIsDragging) }}
                 onMouseLeave={(e: any)=> {setHoverTime(0)}}
                 onMouseMove={(e: any)=> {handleMouseOverOnProgressBar(e, videoRef, duration, progressContainerRef, setHoverTime)}}

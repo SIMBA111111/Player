@@ -1,6 +1,6 @@
 import { RefObject } from "react"
 
-export const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>, duration: number, setProgress: any, videoRef: RefObject<any>, progressContainerRef: RefObject<any>, debounceRef: RefObject<any>) => {
+export const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>, duration: number, setProgress: any, videoRef: RefObject<any>, progressContainerRef: RefObject<any>) => {
     console.log('handleProgressClick');
     
     if (!videoRef.current || !duration || !progressContainerRef.current) return;
@@ -27,31 +27,28 @@ export const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>, setIsDraggi
 };
 
 
-export const handleDocumentMouseMove = (e: MouseEvent, duration: number, setProgress: any, setTimeHover: any, videoRef: RefObject<any>, progressContainerRef: RefObject<any>, debounceRef: RefObject<any>) => {
+export const handleDocumentMouseMove = (e: MouseEvent, duration: number, setProgress: any, setTimeHover: any, videoRef: RefObject<any>, progressContainerRef: RefObject<any>) => {
     videoRef.current?.pause()
-    clearTimeout(debounceRef.current)
 
-    debounceRef.current = setTimeout(() => {
-        if (!videoRef.current || !duration || !progressContainerRef.current) return;
-        
-        const timeHoverPosition = document.getElementById('timeHover')
-        
-        const progressContainer = progressContainerRef.current;
-        const rect = progressContainer.getBoundingClientRect();
-        
-        // Вычисляем позицию относительно прогресс-бара
-        const clickPosition = Math.min(Math.max(e.clientX - rect.left, 0), rect.width);
-        const clickPercentage = clickPosition / rect.width;
-        
-        if (timeHoverPosition && timeHoverPosition.style) {
-            timeHoverPosition.style.left = `${String(clickPosition)}px`;
-        }
+    if (!videoRef.current || !duration || !progressContainerRef.current) return;
+    
+    const timeHoverPosition = document.getElementById('timeHover')
+    
+    const progressContainer = progressContainerRef.current;
+    const rect = progressContainer.getBoundingClientRect();
+    
+    // Вычисляем позицию относительно прогресс-бара
+    const clickPosition = Math.min(Math.max(e.clientX - rect.left, 0), rect.width);
+    const clickPercentage = clickPosition / rect.width;
+    
+    if (timeHoverPosition && timeHoverPosition.style) {
+        timeHoverPosition.style.left = `${String(clickPosition)}px`;
+    }
 
-        const newProgress = clickPercentage * 100;
-        
-        setTimeHover(clickPercentage * duration)
-        setProgress(newProgress);
-    }, 5)
+    const newProgress = clickPercentage * 100;
+    
+    setTimeHover(clickPercentage * duration)
+    setProgress(newProgress);
 };
 
 export const handleDocumentMouseUp = (e: MouseEvent, setTimeHover: any, setIsDragging: any, videoRef: RefObject<any>, duration: number, progressContainerRef: RefObject<any>) => {
