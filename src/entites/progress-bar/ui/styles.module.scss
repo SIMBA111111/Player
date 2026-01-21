@@ -35,7 +35,7 @@
 .progressBackgroundContainer {
     display: flex;
     flex-direction: row;
-    gap: 15px;
+    gap: 2px;
 }
 
 .progressBackground {
@@ -57,18 +57,20 @@
     }
 }
 
-// .progressFilledContainer {
-//     position: absolute;
-//     display: flex;
-//     flex-direction: row;
-//     gap: 15px;
-// }
+.progressFilledContainer {
+    width: 100%;
+    position: absolute;
+    top: 0;
+    display: flex;
+    flex-direction: row;
+    gap: 2px;
+}
 
 .progressFilled {
     // position: absolute;
     height: 10px;
-    background: linear-gradient(90deg, #ff0080, #ff2e00);
-    border-radius: 2px;
+    background: red;
+    // border-radius: 2px;
     &:hover {
         .progressFilled {
             height: 15px;

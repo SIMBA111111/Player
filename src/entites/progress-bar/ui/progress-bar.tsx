@@ -105,11 +105,11 @@ export const ProgressBar: React.FC<IProgressBar> = ({duration, videoRef, progres
         return fragments.map((fragment: IFragment, index: number) => {
             const fragmentTime = fragment.end - fragment.start
             const fragmentWight = fragmentTime * 100 / duration
-            // console.log(`fragmentWight ${index + 1}: `, fragmentWight);
+            console.log(`fragmentWight ${index}: `, fragmentWight);
 
             return (
                 <>
-                <div key={index} className={styles.progressBackground} style={{width: `${fragmentWight}%`}}></div>
+                <div key={index} className={styles.progressBackground} style={{width: `${fragmentWight.toFixed(4)}%`}}></div>
                 {/* <div 
                     className={styles.progressFilled}
                     style={{ width: `${fragmentWight}%` }}
@@ -138,57 +138,56 @@ export const ProgressBar: React.FC<IProgressBar> = ({duration, videoRef, progres
 
 
 const fragmentedFilledBar = () => {
-    let filled = 0;
-    let result = [];
+    const currentTime = videoRef.current?.currentTime || 0;
+    const result = [];
     
-    for (let index = 0; index < fragments.length; index++) {
-        const fragment = fragments[index];
+    for (let i = 0; i < fragments.length; i++) {
+        const fragment = fragments[i];
         const fragmentTime = fragment.end - fragment.start;
+        const fragmentWidthPercent = (fragmentTime / duration) * 100;
+        console.log(`fragmentedFilledBar ${i}: `, fragmentWidthPercent);
         
-        // Получаем текущее время видео
-        const currentTime = videoRef.current?.currentTime || 0;
+        const fragmentStartPercent = (fragment.start / duration) * 100;
         
-        // Если текущее время меньше начала фрагмента, прерываем
         if (currentTime < fragment.start) {
-            break; // Прерываем цикл
+            // Если не дошли до этого фрагмента, прерываем
+            break;
         }
         
-        const fragmentWidthPercent = (fragmentTime / duration) * 100;
-        const fragmentStartPercent = (fragment.start / duration) * 100;
-        const currentProgressPercent = (currentTime / duration) * 100;
-        
-        // Определяем, какую часть фрагмента заполнить
-        let fillWidthPercent = 0;
-        
         if (currentTime <= fragment.end) {
-            // Текущий фрагмент заполняется частично
+            // Текущий фрагмент - заполняем частично
             const timeInFragment = currentTime - fragment.start;
-            fillWidthPercent = (timeInFragment / fragmentTime) * fragmentWidthPercent;
+            const fillPercent = (timeInFragment / fragmentTime) * fragmentWidthPercent;
             
             result.push(
                 <div 
-                    key={`filled-${index}`}
+                    key={`filled-${i}`}
                     className={styles.progressFilled}
                     style={{ 
-                        width: `${fillWidthPercent}%`,
-                        left: `${fragmentStartPercent}%`
+                        width: `${fillPercent}%`,
+                        // left: `${fragmentStartPercent}%`,
+                        // position: 'absolute'
                     }}
                 />
             );
-            break; // Прерываем цикл после текущего фрагмента
+            // После нахождения текущего фрагмента прерываем цикл
+            break;
         } else {
-            // Весь фрагмент заполнен
+            // Фрагмент полностью пройден
+            console.log('Фрагмент полностью пройден: ', fragmentWidthPercent);
+            
             result.push(
                 <div 
-                    key={`filled-${index}`}
+                    key={`filled-${i}`}
                     className={styles.progressFilled}
                     style={{ 
                         width: `${fragmentWidthPercent}%`,
-                        left: `${fragmentStartPercent}%`
+                        // left: `${fragmentStartPercent}%`,
+                        // position: 'absolute'
                     }}
                 />
             );
-            // Продолжаем цикл для следующих фрагментов
+            // Продолжаем цикл для следующих пройденных фрагментов
         }
     }
     
@@ -234,7 +233,7 @@ const fragmentedFilledBar = () => {
                 <div className={styles.progressBackgroundContainer}>
                     {fragmentedProgressBar()}
                 </div>
-                <div className={styles.progressBackgroundContainer}>
+                <div className={styles.progressFilledContainer}>
                     {fragmentedFilledBar()}
                 </div>
                 {/* <div 
