@@ -1,6 +1,6 @@
 'use client'
 
-import { RefObject, useCallback, useEffect, useRef, useState } from "react";
+import { RefObject, useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { getHHSStime } from "@/shared/utils/getHHSStime"
 import { IFragment } from "@/widget/video-tag/model/video-tag.interface";
@@ -29,6 +29,7 @@ export const ProgressBar: React.FC<IProgressBar> = ({duration, videoRef, progres
     const [hoverTime, setHoverTime] = useState<number>(0);
     const [isDragging, setIsDragging] = useState(false);
     const [bufferedFragments, setBufferedFragments] = useState<IBufferedFragment[]>([]);
+    const [dragTime, setDragTime] = useState<number | null>(null); // Новое состояние для времени при перетаскивании
     const progressContainerRef = useRef<HTMLDivElement>(null);
 
     const handleMouseMove = useCallback((e: MouseEvent) => {
@@ -44,9 +45,10 @@ export const ProgressBar: React.FC<IProgressBar> = ({duration, videoRef, progres
         if (!video) return;
 
         const updateProgress = () => {
-            if (duration > 0) {
+            if (duration > 0 && !isDragging) { // Не обновляем при перетаскивании
                 const currentProgress = (video.currentTime / duration) * 100;
                 setProgress(currentProgress);
+                setDragTime(null); // Сбрасываем dragTime при обычном воспроизведении
             }
         };
 
@@ -55,20 +57,61 @@ export const ProgressBar: React.FC<IProgressBar> = ({duration, videoRef, progres
         return () => {
             video.removeEventListener('timeupdate', updateProgress);
         };
-    }, [videoRef, duration]);
+    }, [videoRef, duration, isDragging]); // Добавили isDragging в зависимости
 
     // Эффект для подписки на события мыши на document при перетаскивании
     useEffect(() => {
         if (!isDragging) return;
 
-        document.addEventListener('mousemove', handleMouseMove, {passive: true});
-        document.addEventListener('mouseup', handleMouseUp, {passive: true});
+        const handleMouseMoveWrapper = (e: MouseEvent) => {
+            if (!progressContainerRef.current || !duration) return;
+            
+            const rect = progressContainerRef.current.getBoundingClientRect();
+            const clickPosition = Math.min(Math.max(e.clientX - rect.left, 0), rect.width);
+            const clickPercentage = clickPosition / rect.width;
+            
+            const newTime = clickPercentage * duration;
+            
+            // Обновляем время перетаскивания
+            setDragTime(newTime);
+            
+            const newProgress = clickPercentage * 100;
+            setProgress(newProgress);
+            setHoverTime(newTime);
+            
+            // Обновляем позицию подсказки
+            const timeHoverPosition = document.getElementById('timeHover');
+            if (timeHoverPosition && timeHoverPosition.style) {
+                timeHoverPosition.style.left = `${clickPosition}px`;
+            }
+        };
+
+        const handleMouseUpWrapper = (e: MouseEvent) => {
+            if (!progressContainerRef.current || !videoRef.current || !duration) return;
+            
+            const rect = progressContainerRef.current.getBoundingClientRect();
+            const clickPosition = Math.min(Math.max(e.clientX - rect.left, 0), rect.width);
+            const clickPercentage = clickPosition / rect.width;
+            
+            const newTime = clickPercentage * duration;
+            
+            // Перематываем видео
+            videoRef.current.currentTime = newTime;
+            videoRef.current.play().catch(console.error);
+            
+            setHoverTime(0);
+            setDragTime(null);
+            setIsDragging(false);
+        };
+
+        document.addEventListener('mousemove', handleMouseMoveWrapper, {passive: true});
+        document.addEventListener('mouseup', handleMouseUpWrapper, {passive: true});
 
         return () => {
-            document.removeEventListener('mousemove', handleMouseMove);
-            document.removeEventListener('mouseup', handleMouseUp);
+            document.removeEventListener('mousemove', handleMouseMoveWrapper);
+            document.removeEventListener('mouseup', handleMouseUpWrapper);
         };
-    }, [isDragging, handleMouseMove, handleMouseUp]);
+    }, [isDragging, duration, videoRef]); // Убрали старые обработчики
 
     useEffect(() => {
         if (!videoRef?.current) return;
@@ -101,145 +144,120 @@ export const ProgressBar: React.FC<IProgressBar> = ({duration, videoRef, progres
         };
     }, [videoRef]);
 
-    const fragmentedProgressBar = () => {
+    const fragmentedProgressBar = useMemo(() => {
         return fragments.map((fragment: IFragment, index: number) => {
             const fragmentTime = fragment.end - fragment.start
-            const fragmentWight = fragmentTime * 100 / duration
-            console.log(`fragmentWight ${index}: `, fragmentWight);
+            const fragmentWidth = fragmentTime * 100 / duration
 
             return (
-                <>
-                <div key={index} className={styles.progressBackground} style={{width: `${fragmentWight.toFixed(4)}%`}}></div>
-                {/* <div 
-                    className={styles.progressFilled}
-                    style={{ width: `${fragmentWight}%` }}
-                ></div> */}
-                {/* <div className={styles.progressFilledContainer}>
-                    {fragmentWight > progress ?
-                        <div 
-                            className={styles.progressFilled}
-                            style={{ width: `${fragmentWight}%` }}
-                        >
-                        </div> 
-                        : 
-                        <div 
-                            className={styles.progressFilled}
-                            style={{ width: `100%` }}
-                        >
-                        </div> 
-                    }
-                </div> */}
-                </>
+                <div 
+                    key={index} 
+                    className={styles.progressBackground} 
+                    style={{width: `${fragmentWidth.toFixed(4)}%`}}
+                />
             )
-
         })
-    }
+    }, [fragments, duration])
 
-
-
-const fragmentedFilledBar = () => {
-    const currentTime = videoRef.current?.currentTime || 0;
-    const result = [];
-    
-    for (let i = 0; i < fragments.length; i++) {
-        const fragment = fragments[i];
-        const fragmentTime = fragment.end - fragment.start;
-        const fragmentWidthPercent = (fragmentTime / duration) * 100;
-        console.log(`fragmentedFilledBar ${i}: `, fragmentWidthPercent);
+    // Используем dragTime при перетаскивании, иначе currentTime видео
+    const fragmentedFilledBar = useMemo(() => {
+        // Используем dragTime при перетаскивании
+        const currentTime = isDragging && dragTime !== null 
+            ? dragTime 
+            : videoRef.current?.currentTime || 0;
         
-        const fragmentStartPercent = (fragment.start / duration) * 100;
+        const result = [];
         
-        if (currentTime < fragment.start) {
-            // Если не дошли до этого фрагмента, прерываем
-            break;
+        for (let i = 0; i < fragments.length; i++) {
+            const fragment = fragments[i];
+            const fragmentTime = fragment.end - fragment.start;
+            const fragmentWidthPercent = (fragmentTime / duration) * 100;
+            const fragmentStartPercent = (fragment.start / duration) * 100;
+            
+            if (currentTime < fragment.start) {
+                // Если не дошли до этого фрагмента, прерываем
+                break;
+            }
+            
+            if (currentTime <= fragment.end) {
+                // Текущий фрагмент - заполняем частично
+                const timeInFragment = currentTime - fragment.start;
+                const fillPercent = (timeInFragment / fragmentTime) * fragmentWidthPercent;
+                
+                result.push(
+                    <div 
+                        key={`filled-${i}`}
+                        className={styles.progressFilled}
+                        style={{ 
+                            width: `${fillPercent}%`,
+                            // left: `${fragmentStartPercent}%`,
+                            // position: 'absolute'
+                        }}
+                    />
+                );
+                // После нахождения текущего фрагмента прерываем цикл
+                break;
+            } else {
+                // Фрагмент полностью пройден
+                result.push(
+                    <div 
+                        key={`filled-${i}`}
+                        className={styles.progressFilled}
+                        style={{ 
+                            width: `${fragmentWidthPercent}%`,
+                            // left: `${fragmentStartPercent}%`,
+                            // position: 'absolute'
+                        }}
+                    />
+                );
+                // Продолжаем цикл для следующих пройденных фрагментов
+            }
         }
         
-        if (currentTime <= fragment.end) {
-            // Текущий фрагмент - заполняем частично
-            const timeInFragment = currentTime - fragment.start;
-            const fillPercent = (timeInFragment / fragmentTime) * fragmentWidthPercent;
-            
-            result.push(
-                <div 
-                    key={`filled-${i}`}
-                    className={styles.progressFilled}
-                    style={{ 
-                        width: `${fillPercent}%`,
-                        // left: `${fragmentStartPercent}%`,
-                        // position: 'absolute'
-                    }}
-                />
-            );
-            // После нахождения текущего фрагмента прерываем цикл
-            break;
-        } else {
-            // Фрагмент полностью пройден
-            console.log('Фрагмент полностью пройден: ', fragmentWidthPercent);
-            
-            result.push(
-                <div 
-                    key={`filled-${i}`}
-                    className={styles.progressFilled}
-                    style={{ 
-                        width: `${fragmentWidthPercent}%`,
-                        // left: `${fragmentStartPercent}%`,
-                        // position: 'absolute'
-                    }}
-                />
-            );
-            // Продолжаем цикл для следующих пройденных фрагментов
-        }
-    }
-    
-    return result;
-};
-
-    // fragmentedProgressBar()
+        return result;
+    }, [videoRef, progress, isDragging, dragTime, fragments, duration]) // Добавили isDragging и dragTime в зависимости
 
     return (
         <>
-            <div id='timeHover' className={hoverTime ? styles.progressTimeHover : styles.progressTimeHover_hidden}>
-            {/* <div id='timeHover' className={styles.progressTimeHover}> */}
+            <div 
+                id='timeHover' 
+                className={hoverTime ? styles.progressTimeHover : styles.progressTimeHover_hidden}
+                style={{ 
+                    left: hoverTime ? `${(hoverTime / duration) * 100}%` : '0',
+                    display: hoverTime ? 'block' : 'none'
+                }}
+            >
                 {getHHSStime(Math.trunc(hoverTime))}
             </div>
             <div 
                 id="progressBar"
                 ref={progressContainerRef}
-                // className={isVisibleTools ? styles.progressContainer : styles.progressContainer_hidden}
                 className={styles.progressContainer}
-                onClick={(e: any) => { handleProgressClick(e, duration, setProgress, videoRef, progressContainerRef) }}
-                onMouseDown={(e: any) => { handleMouseDown(e, setIsDragging, setPaused) }}
-                onMouseLeave={(e: any)=> {setHoverTime(0)}}
-                onMouseMove={(e: any)=> {handleMouseOverOnProgressBar(e, videoRef, duration, progressContainerRef, setHoverTime)}}
-
+                onClick={(e: any) => { 
+                    if (!isDragging) { // Игнорируем клик, если было перетаскивание
+                        handleProgressClick(e, duration, setProgress, videoRef, progressContainerRef);
+                    }
+                }}
+                onMouseDown={(e: any) => { 
+                    handleMouseDown(e, setIsDragging, setPaused);
+                }}
+                onMouseLeave={() => {
+                    if (!isDragging) {
+                        setHoverTime(0);
+                    }
+                }}
+                onMouseMove={(e: any) => {
+                    if (!isDragging) {
+                        handleMouseOverOnProgressBar(e, videoRef, duration, progressContainerRef, setHoverTime);
+                    }
+                }}
             >
-                {/* {bufferedFragments.map((fragment, index) => {
-                    const startPercent = (fragment.start / duration) * 100;
-                    const widthPercent = ((fragment.end - fragment.start) / duration) * 100;
-                    
-                    return (
-                        <div 
-                            key={index}
-                            className={styles.progressBuffered}
-                            style={{
-                                left: `${startPercent}%`,
-                                width: `${widthPercent}%`,
-                                position: 'absolute',
-                            }}
-                        ></div>
-                    );
-                })} */}
-                {/* <div className={styles.progressBackground}></div> */}
                 <div className={styles.progressBackgroundContainer}>
-                    {fragmentedProgressBar()}
+                    {fragmentedProgressBar}
                 </div>
                 <div className={styles.progressFilledContainer}>
-                    {fragmentedFilledBar()}
+                    {fragmentedFilledBar}
                 </div>
-                {/* <div 
-                    className={styles.progressFilled}
-                    style={{ width: `${progress}%` }}
-                ></div> */}
             </div>
         </>
     )
