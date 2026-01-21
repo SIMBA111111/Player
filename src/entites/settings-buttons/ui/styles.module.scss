@@ -13,15 +13,19 @@
 .settingsOptions {
     display: block;
     position: absolute;
-    bottom: 200%;
+    // bottom: 200%;
     background-color: aqua;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    // gap: 10px;
 
     &_hidden {
         display: none;
     }
+}
+
+.settingsWrapper {
+    position: relative;
 }
 
 .settingOption {
@@ -33,7 +37,44 @@
 }
 
 .settings {
-    color: #000;
+    color: #ffffff;
+    background: none;
+    cursor: pointer;
+    border: none;
+}
+
+.modalHeader {
+    cursor: pointer;
+    color: #fff;
+}
+
+.modalBtn {
+    background: none;
+    padding: 10 5;
+    color: #fff;
+    border: none;
+    font-size: 20px;
+
+    &:hover {
+        background-color: rgb(255, 231, 201, 0.1);
+        border-radius: 10px;
+    }
+}
+
+.modalBtnContainer {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.modal {
+    width: 200px;
+    position: absolute;
+    bottom: 50px;
+    background-color: rgb(38, 41, 41, 0.7);
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
 }
 
 .fullScreen {

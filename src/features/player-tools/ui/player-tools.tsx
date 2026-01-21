@@ -3,7 +3,6 @@
 import { useState } from "react";
 
 import { ProgressBar } from '@/entites/progress-bar'
-import { getHHSStime } from "@/shared/utils/getHHSStime";
 import { SettingsButtons } from "@/entites/settings-buttons";
 import { PlayButtons } from "@/entites/play-buttons";
 import { SoundAndTimeVolume } from "@/entites/sound-volume";
@@ -24,7 +23,8 @@ export const PlayerTools: React.FC<IPlayerTools> = ({
     isVisibleTools, 
     setIsVisibleTools,
     paused,
-    setPaused
+    setPaused,
+    fragments
 }) => {
     const [progress, setProgress] = useState(0);
 
@@ -34,7 +34,15 @@ export const PlayerTools: React.FC<IPlayerTools> = ({
                 onClick={(e) => e.stopPropagation()}
             >             
 
-                <ProgressBar duration={duration} videoRef={videoRef} progress={progress} setProgress={setProgress} isVisibleTools={isVisibleTools}/>
+                <ProgressBar 
+                    duration={duration}
+                    videoRef={videoRef} 
+                    progress={progress} 
+                    setProgress={setProgress} 
+                    isVisibleTools={isVisibleTools} 
+                    setPaused={setPaused}
+                    fragments={fragments}    
+                />
 
                 {/* <div className={isVisibleTools ? styles.toolsBackground : styles.toolsBackground_hidden}></div> */}
                 <div className={styles.toolsBackground}></div>
@@ -45,13 +53,7 @@ export const PlayerTools: React.FC<IPlayerTools> = ({
 
                     <SoundAndTimeVolume videoRef={videoRef} isVisibleTools={isVisibleTools} duration={duration}/>
 
-                    {/* <div className={isVisibleTools ? styles.indicateTime : styles.indicateTime_hidden}> */}
-                    {/* <div className={styles.indicateTime}>
-                        {videoRef.current?.currentTime ? getHHSStime(Math.trunc(videoRef.current.currentTime)) : '00:00'}
-                         / {getHHSStime(Math.trunc(duration))} 
-                    </div> */}
-
-                    <SettingsButtons videoRef={videoRef} isVisibleTools={isVisibleTools}/>
+                    <SettingsButtons videoRef={videoRef} isVisibleTools={isVisibleTools} hls={hls}/>
                 </div>
             </div>
         </div>

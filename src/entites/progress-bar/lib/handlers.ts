@@ -21,14 +21,14 @@ export const handleProgressClick = (e: React.MouseEvent<HTMLDivElement>, duratio
 };
 
 
-export const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>, setIsDragging: any) => {
+export const handleMouseDown = (e: React.MouseEvent<HTMLDivElement>, setIsDragging: any, setPaused: (paused: boolean) => void) => {
     e.preventDefault();
     setIsDragging(true);
+    setPaused(true)
 };
 
 
 export const handleDocumentMouseMove = (e: MouseEvent, duration: number, setProgress: any, setTimeHover: any, videoRef: RefObject<any>, progressContainerRef: RefObject<any>) => {
-    videoRef.current?.pause()
 
     if (!videoRef.current || !duration || !progressContainerRef.current) return;
     

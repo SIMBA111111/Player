@@ -10,11 +10,14 @@ import { IVideoTag } from "../model/video-tag.interface"
 import styles from './styles.module.scss'
 
 
-export const VideoTag: React.FC<IVideoTag> = ({hls, duration, videoRef}) => {
+export const VideoTag: React.FC<IVideoTag> = ({hls, duration, videoRef, fragments}) => {
     const [isVisibleTools, setIsVisibleTools] = useState(false)
     const [paused, setPaused] = useState<boolean>(true)
-    
     const hideToolsTimer = useRef<any>(null)
+    
+    if (paused) {
+        videoRef?.current?.pause() 
+    }
 
     const {handleMouseMove, handleMouseLeave, handleMouseOver, handlePlayPause} = VideoTagHandlers(hideToolsTimer, setIsVisibleTools)
 
@@ -22,7 +25,16 @@ export const VideoTag: React.FC<IVideoTag> = ({hls, duration, videoRef}) => {
         <div id="playerContainer" className={isVisibleTools ? styles.playerContainer : styles.playerContainer_hidden} onClick={() => {handlePlayPause(videoRef, setPaused)}} onMouseMove={() => {handleMouseMove()}} onMouseLeave={() => {handleMouseLeave()}} onMouseOver={()=>{handleMouseOver()}}>
         {/* <div id="playerContainer" className={styles.playerContainer} onClick={() => {handlePlayPause(videoRef)}} onMouseMove={() => {handleMouseMove()}} onMouseLeave={() => {handleMouseLeave()}} onMouseOver={()=>{handleMouseOver()}}> */}
             <video className={styles.video} id='video' ref={videoRef}></video>
-            <PlayerTools hls={hls} duration={duration} videoRef={videoRef} isVisibleTools={isVisibleTools} setIsVisibleTools={setIsVisibleTools} paused={paused} setPaused={setPaused}/>
+            <PlayerTools 
+                hls={hls}
+                duration={duration} 
+                videoRef={videoRef} 
+                isVisibleTools={isVisibleTools} 
+                setIsVisibleTools={setIsVisibleTools} 
+                paused={paused} 
+                setPaused={setPaused}
+                fragments={fragments}
+                />
         </div>  
     )
 }

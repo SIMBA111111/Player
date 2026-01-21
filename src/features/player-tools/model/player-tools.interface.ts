@@ -1,3 +1,4 @@
+import { IFragment } from "@/widget/video-tag/model/video-tag.interface";
 import { HlsEventEmitter } from "hls.js";
 import { RefObject } from "react";
 
@@ -9,4 +10,5 @@ export interface IPlayerTools {
     setIsVisibleTools: (isVisible: boolean) => void
     paused: boolean;
     setPaused: (paused: boolean) => void
+    fragments: IFragment[]
 }

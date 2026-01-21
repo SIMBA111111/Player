@@ -3,10 +3,12 @@
 import { RefObject, useCallback, useEffect, useRef, useState } from "react";
 
 import { getHHSStime } from "@/shared/utils/getHHSStime"
+import { IFragment } from "@/widget/video-tag/model/video-tag.interface";
 
 import { handleDocumentMouseMove, handleDocumentMouseUp, handleMouseDown, handleMouseOverOnProgressBar, handleProgressClick } from "../lib/handlers"
 
 import styles from './styles.module.scss'
+
 
 interface IProgressBar {
     duration: number;
@@ -14,6 +16,8 @@ interface IProgressBar {
     progress: number;
     setProgress: (progress: number) => void;
     isVisibleTools: boolean;
+    setPaused: (paused: boolean) => void
+    fragments: IFragment[]
 }
 
 interface IBufferedFragment {
@@ -21,7 +25,7 @@ interface IBufferedFragment {
     end: number;
 }
 
-export const ProgressBar: React.FC<IProgressBar> = ({duration, videoRef, progress, setProgress, isVisibleTools}) => {
+export const ProgressBar: React.FC<IProgressBar> = ({duration, videoRef, progress, setProgress, isVisibleTools, setPaused, fragments}) => {
     const [hoverTime, setHoverTime] = useState<number>(0);
     const [isDragging, setIsDragging] = useState(false);
     const [bufferedFragments, setBufferedFragments] = useState<IBufferedFragment[]>([]);
@@ -97,6 +101,71 @@ export const ProgressBar: React.FC<IProgressBar> = ({duration, videoRef, progres
         };
     }, [videoRef]);
 
+    const fragmentedProgressBar = () => {
+        return fragments.map((fragment: IFragment, index: number) => {
+            const fragmentTime = fragment.end - fragment.start
+            const fragmentWight = fragmentTime * 100 / duration
+            // console.log(`fragmentWight ${index + 1}: `, fragmentWight);
+
+            return (
+                <>
+                <div key={index} className={styles.progressBackground} style={{width: `${fragmentWight}%`}}></div>
+                {/* <div 
+                    className={styles.progressFilled}
+                    style={{ width: `${fragmentWight}%` }}
+                ></div> */}
+                {/* <div className={styles.progressFilledContainer}>
+                    {fragmentWight > progress ?
+                        <div 
+                            className={styles.progressFilled}
+                            style={{ width: `${fragmentWight}%` }}
+                        >
+                        </div> 
+                        : 
+                        <div 
+                            className={styles.progressFilled}
+                            style={{ width: `100%` }}
+                        >
+                        </div> 
+                    }
+                </div> */}
+                </>
+            )
+
+        })
+    }
+
+
+
+    const fragmentedFilledBar = () => {
+        var filled = 0
+        return fragments.map((fragment: IFragment, index: number) => {
+            const fragmentTime = fragment.end - fragment.start
+            const fragmentWight = fragmentTime * 100 / duration
+            // console.log(`fragmentWight ${index + 1}: `, fragmentWight);
+            filled += fragmentWight
+            return (
+                <>
+                {fragmentWight > progress ?
+                    <div 
+                        className={styles.progressFilled}
+                        style={{ width: `${fragmentWight}%` }}
+                    >
+                    </div> 
+                    : 
+                    <div 
+                        className={styles.progressFilled}
+                        style={{ width: `${progress - filled}` }}
+                    >
+                    </div> 
+                }
+                </>
+            )
+        })
+    }
+
+    // fragmentedProgressBar()
+
     return (
         <>
             <div id='timeHover' className={hoverTime ? styles.progressTimeHover : styles.progressTimeHover_hidden}>
@@ -109,12 +178,12 @@ export const ProgressBar: React.FC<IProgressBar> = ({duration, videoRef, progres
                 // className={isVisibleTools ? styles.progressContainer : styles.progressContainer_hidden}
                 className={styles.progressContainer}
                 onClick={(e: any) => { handleProgressClick(e, duration, setProgress, videoRef, progressContainerRef) }}
-                onMouseDown={(e: any) => { handleMouseDown(e, setIsDragging) }}
+                onMouseDown={(e: any) => { handleMouseDown(e, setIsDragging, setPaused) }}
                 onMouseLeave={(e: any)=> {setHoverTime(0)}}
                 onMouseMove={(e: any)=> {handleMouseOverOnProgressBar(e, videoRef, duration, progressContainerRef, setHoverTime)}}
 
             >
-                {bufferedFragments.map((fragment, index) => {
+                {/* {bufferedFragments.map((fragment, index) => {
                     const startPercent = (fragment.start / duration) * 100;
                     const widthPercent = ((fragment.end - fragment.start) / duration) * 100;
                     
@@ -129,12 +198,18 @@ export const ProgressBar: React.FC<IProgressBar> = ({duration, videoRef, progres
                             }}
                         ></div>
                     );
-                })}
-                <div className={styles.progressBackground}></div>
-                <div 
+                })} */}
+                {/* <div className={styles.progressBackground}></div> */}
+                <div className={styles.progressBackgroundContainer}>
+                    {fragmentedProgressBar()}
+                </div>
+                <div className={styles.progressBackgroundContainer}>
+                    {fragmentedFilledBar()}
+                </div>
+                {/* <div 
                     className={styles.progressFilled}
                     style={{ width: `${progress}%` }}
-                ></div>
+                ></div> */}
             </div>
         </>
     )
