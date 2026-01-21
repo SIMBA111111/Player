@@ -137,32 +137,63 @@ export const ProgressBar: React.FC<IProgressBar> = ({duration, videoRef, progres
 
 
 
-    const fragmentedFilledBar = () => {
-        var filled = 0
-        return fragments.map((fragment: IFragment, index: number) => {
-            const fragmentTime = fragment.end - fragment.start
-            const fragmentWight = fragmentTime * 100 / duration
-            // console.log(`fragmentWight ${index + 1}: `, fragmentWight);
-            filled += fragmentWight
-            return (
-                <>
-                {fragmentWight > progress ?
-                    <div 
-                        className={styles.progressFilled}
-                        style={{ width: `${fragmentWight}%` }}
-                    >
-                    </div> 
-                    : 
-                    <div 
-                        className={styles.progressFilled}
-                        style={{ width: `${progress - filled}` }}
-                    >
-                    </div> 
-                }
-                </>
-            )
-        })
+const fragmentedFilledBar = () => {
+    let filled = 0;
+    let result = [];
+    
+    for (let index = 0; index < fragments.length; index++) {
+        const fragment = fragments[index];
+        const fragmentTime = fragment.end - fragment.start;
+        
+        // Получаем текущее время видео
+        const currentTime = videoRef.current?.currentTime || 0;
+        
+        // Если текущее время меньше начала фрагмента, прерываем
+        if (currentTime < fragment.start) {
+            break; // Прерываем цикл
+        }
+        
+        const fragmentWidthPercent = (fragmentTime / duration) * 100;
+        const fragmentStartPercent = (fragment.start / duration) * 100;
+        const currentProgressPercent = (currentTime / duration) * 100;
+        
+        // Определяем, какую часть фрагмента заполнить
+        let fillWidthPercent = 0;
+        
+        if (currentTime <= fragment.end) {
+            // Текущий фрагмент заполняется частично
+            const timeInFragment = currentTime - fragment.start;
+            fillWidthPercent = (timeInFragment / fragmentTime) * fragmentWidthPercent;
+            
+            result.push(
+                <div 
+                    key={`filled-${index}`}
+                    className={styles.progressFilled}
+                    style={{ 
+                        width: `${fillWidthPercent}%`,
+                        left: `${fragmentStartPercent}%`
+                    }}
+                />
+            );
+            break; // Прерываем цикл после текущего фрагмента
+        } else {
+            // Весь фрагмент заполнен
+            result.push(
+                <div 
+                    key={`filled-${index}`}
+                    className={styles.progressFilled}
+                    style={{ 
+                        width: `${fragmentWidthPercent}%`,
+                        left: `${fragmentStartPercent}%`
+                    }}
+                />
+            );
+            // Продолжаем цикл для следующих фрагментов
+        }
     }
+    
+    return result;
+};
 
     // fragmentedProgressBar()
 
