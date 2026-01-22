@@ -38,157 +38,141 @@ export const ProgressBar: React.FC<IProgressBar> = ({
     const progressContainerRef = useRef<HTMLDivElement>(null);
     const context = usePlayerContext();
 
-    // Объединенные вычисления для всех сегментов прогресс-бара
+    // Единая функция для вычисления всех сегментов
     const progressSegments = useMemo(() => {
-        const currentTime = isDragging && dragTime !== null 
-            ? dragTime 
-            : videoRef.current?.currentTime || 0;
+    const currentTime = isDragging && dragTime !== null 
+        ? dragTime 
+        : videoRef.current?.currentTime || 0;
+    
+    const GAP_PERCENT = 0.3;
+    const segments: JSX.Element[] = [];
+    
+    // Предварительно вычисляем позиции всех фрагментов
+    const fragmentPositions = fragments.map((fragment, index) => {
+        const fragmentTime = fragment.end - fragment.start;
+        const widthPercent = (fragmentTime / duration) * 100;
         
-        const backgroundSegments: JSX.Element[] = [];
-        const filledSegments: JSX.Element[] = [];
-        const bufferedSegments: JSX.Element[] = [];
+        // Вычисляем left позицию с учетом gap
+        let leftPercent = 0;
+        for (let i = 0; i < index; i++) {
+            const prevFragmentTime = fragments[i].end - fragments[i].start;
+            leftPercent += (prevFragmentTime / duration) * 100 + GAP_PERCENT;
+        }
+        
+        return {
+            ...fragment,
+            index,
+            widthPercent,
+            leftPercent,
+            time: fragmentTime
+        };
+    });
 
-        // Вычисляем gap в процентах (например, 1% от общей ширины)
-        const GAP_PERCENT = 0.3; // небольшой gap в процентах
+    // 1. Сначала добавляем все фоновые сегменты
+    fragmentPositions.forEach(fragment => {
+        segments.push(
+            <div 
+                key={`bg-${fragment.index}`} 
+                className={`${styles.progressBackground} ${styles.progressFragment}`} 
+                style={{
+                    width: `${fragment.widthPercent}%`,
+                    left: `${fragment.leftPercent}%`,
+                    zIndex: 1
+                }}
+            />
+        );
+    });
 
-        // 1. Фоновые сегменты
-        let accumulatedLeft = 0;
-        fragments.forEach((fragment: IFragment, index: number) => {
-            const fragmentTime = fragment.end - fragment.start;
-            const fragmentWidthPercent = (fragmentTime / duration) * 100;
+    // 2. Обрабатываем каждый фрагмент: буфер + заполненная часть
+    fragmentPositions.forEach(fragment => {
+        const currentFragmentBuffers: {left: number, width: number}[] = [];
+        
+        // Собираем буферизированные участки для этого фрагмента
+        bufferedFragments.forEach(buffered => {
+            if (currentTime > fragment.end) return;
+            
+            const overlapStart = Math.max(fragment.start, buffered.start);
+            const overlapEnd = Math.min(fragment.end, buffered.end);
+            
+            if (overlapStart < overlapEnd) {
+                let widthPercent: number;
+                let leftPercent: number;
+                
+                if (currentTime >= fragment.start && currentTime < fragment.end && overlapStart < currentTime) {
+                    // Только часть после currentTime
+                    const visualStart = Math.max(overlapStart, currentTime);
+                    widthPercent = ((overlapEnd - visualStart) / fragment.time) * fragment.widthPercent;
+                    leftPercent = fragment.leftPercent + ((visualStart - fragment.start) / fragment.time) * fragment.widthPercent;
+                } else {
+                    // Весь пересекающийся участок
+                    widthPercent = ((overlapEnd - overlapStart) / fragment.time) * fragment.widthPercent;
+                    leftPercent = fragment.leftPercent + ((overlapStart - fragment.start) / fragment.time) * fragment.widthPercent;
+                }
+                
+                if (widthPercent > 0) {
+                    currentFragmentBuffers.push({
+                        left: leftPercent,
+                        width: widthPercent
+                    });
+                }
+            }
+        });
 
-            backgroundSegments.push(
+        // Добавляем буферизированные части для этого фрагмента
+        currentFragmentBuffers.forEach((buffer, bufferIndex) => {
+            segments.push(
                 <div 
-                    key={`bg-${index}`} 
-                    className={`${styles.progressBackground} ${styles.progressFragment}`} 
-                    style={{
-                        width: `${fragmentWidthPercent}%`,
-                        left: `${accumulatedLeft}%`
+                    key={`buffer-${fragment.index}-${bufferIndex}`}
+                    className={`${styles.progressBuffered} ${styles.progressFragment}`}
+                    style={{ 
+                        width: `${buffer.width}%`,
+                        left: `${buffer.left}%`,
+                        zIndex: 2
                     }}
                 />
             );
-
-            // Увеличиваем накопленную позицию для следующего фрагмента
-            accumulatedLeft += fragmentWidthPercent + GAP_PERCENT;
         });
 
-        // 2. Заполненные (пройденные) сегменты
-        accumulatedLeft = 0;
-        for (let i = 0; i < fragments.length; i++) {
-            const fragment = fragments[i];
-            const fragmentTime = fragment.end - fragment.start;
-            const fragmentWidthPercent = (fragmentTime / duration) * 100;
-            
-            if (currentTime < fragment.start) break;
+        // 3. Добавляем заполненную часть для этого фрагмента
+        if (currentTime >= fragment.start) {
+            let filledWidthPercent = 0;
             
             if (currentTime <= fragment.end) {
                 // Текущий фрагмент - заполняем частично
                 const timeInFragment = currentTime - fragment.start;
-                const fillPercent = (timeInFragment / fragmentTime) * fragmentWidthPercent;
-                
-                filledSegments.push(
-                    <div 
-                        key={`filled-${i}`}
-                        className={styles.progressFilled}
-                        style={{ 
-                            width: `${fillPercent}%`,
-                            left: `${accumulatedLeft}%`
-                        }}
-                    />
-                );
-                break;
+                filledWidthPercent = (timeInFragment / fragment.time) * fragment.widthPercent;
             } else {
                 // Фрагмент полностью пройден
-                filledSegments.push(
+                filledWidthPercent = fragment.widthPercent;
+            }
+            
+            // Создаем один элемент для заполненной части
+            if (filledWidthPercent > 0) {
+                segments.push(
                     <div 
-                        key={`filled-${i}`}
+                        key={`filled-${fragment.index}`}
                         className={`${styles.progressFilled} ${styles.progressFragment}`}
                         style={{ 
-                            width: `${fragmentWidthPercent}%`,
-                            left: `${accumulatedLeft}%`
+                            width: `${filledWidthPercent}%`,
+                            left: `${fragment.leftPercent}%`,
+                            zIndex: 3
                         }}
                     />
                 );
-                accumulatedLeft += fragmentWidthPercent + GAP_PERCENT;
             }
         }
+    });
 
-        // 3. Буферизированные сегменты
-        for (let i = 0; i < bufferedFragments.length; i++) {
-            const buffered = bufferedFragments[i];
-            
-            for (let j = 0; j < fragments.length; j++) {
-                const fragment = fragments[j];
-                
-                // Пропускаем фрагменты позади текущего времени
-                if (currentTime > fragment.end) continue;
-                
-                const overlapStart = Math.max(fragment.start, buffered.start);
-                const overlapEnd = Math.min(fragment.end, buffered.end);
-                
-                if (overlapStart < overlapEnd) {
-                    const fragmentTime = fragment.end - fragment.start;
-                    const fragmentWidthPercent = (fragmentTime / duration) * 100;
-                    
-                    // Вычисляем позицию этого фрагмента с учетом gap
-                    let fragmentLeftPercent = 0;
-                    for (let k = 0; k < j; k++) {
-                        const prevFragment = fragments[k];
-                        const prevFragmentTime = prevFragment.end - prevFragment.start;
-                        fragmentLeftPercent += (prevFragmentTime / duration) * 100 + GAP_PERCENT;
-                    }
-                    
-                    let bufferedPercent: number;
-                    let leftPosition: number;
-                    
-                    // Текущий фрагмент
-                    if (currentTime >= fragment.start && currentTime < fragment.end && overlapStart < currentTime) {
-                        const visualStart = Math.max(overlapStart, currentTime);
-                        const bufferedWidth = ((overlapEnd - visualStart) / fragmentTime) * fragmentWidthPercent;
-                        const currentPosInFragment = ((visualStart - fragment.start) / fragmentTime) * fragmentWidthPercent;
-                        
-                        bufferedPercent = bufferedWidth;
-                        leftPosition = fragmentLeftPercent + currentPosInFragment;
-                    } 
-                    // Будущие фрагменты
-                    else {
-                        const bufferedWidth = ((overlapEnd - overlapStart) / fragmentTime) * fragmentWidthPercent;
-                        const startInFragment = ((overlapStart - fragment.start) / fragmentTime) * fragmentWidthPercent;
-                        
-                        bufferedPercent = bufferedWidth;
-                        leftPosition = fragmentLeftPercent + startInFragment;
-                    }
-                    
-                    if (bufferedPercent > 0) {
-                        bufferedSegments.push(
-                            <div 
-                                key={`buffered-${i}-${j}`}
-                                className={`${styles.progressBuffered} ${styles.progressFragment}`}
-                                style={{ 
-                                    width: `${bufferedPercent}%`,
-                                    left: `${leftPosition}%`
-                                }}
-                            />
-                        );
-                    }
-                }
-            }
-        }
-
-        return {
-            backgroundSegments,
-            filledSegments,
-            bufferedSegments
-        };
-    }, [
-        fragments, 
-        duration, 
-        isDragging, 
-        dragTime, 
-        videoRef, 
-        bufferedFragments,
-        progress
-    ]);
+    return segments;
+}, [
+    fragments, 
+    duration, 
+    isDragging, 
+    dragTime, 
+    videoRef, 
+    bufferedFragments,
+    progress
+]);
 
     // ... остальной код без изменений
     useEffect(() => {
@@ -321,10 +305,7 @@ export const ProgressBar: React.FC<IProgressBar> = ({
                     }
                 }}
             >
-                {/* Все элементы абсолютно позиционированы с одинаковым left */}
-                {progressSegments.backgroundSegments}
-                {progressSegments.bufferedSegments}
-                {progressSegments.filledSegments}
+                {progressSegments}
             </div>
         </>
     );

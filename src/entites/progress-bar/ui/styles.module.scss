@@ -72,3 +72,40 @@
     transition: all 0.2s ease;
     pointer-events: none;
 }
+
+
+
+
+.progressHoverArea {
+    position: absolute;
+    top: 0;
+    height: 10px;
+    background: transparent;
+    cursor: pointer;
+    z-index: 4;
+    
+    &:hover {
+        // Подсветка всего фрагмента при наведении
+        + .progressBackground,
+        ~ .progressBackground {
+            height: 12px;
+            top: -1px;
+        }
+        
+        + .progressFilled,
+        ~ .progressFilled {
+            height: 12px;
+            top: -1px;
+        }
+        
+        + .progressBuffered,
+        ~ .progressBuffered {
+            height: 12px;
+            top: -1px;
+        }
+    }
+}
+
+.progressFragment {
+    transition: height 0.2s ease, top 0.2s ease;
+}
