@@ -63,7 +63,7 @@
     top: 0;
     display: flex;
     flex-direction: row;
-    gap: 2px;
+    gap: 4px;
 }
 
 .progressFilled {
@@ -83,7 +83,7 @@
 }
 
 .progressBuffered {
-    position: absolute;
+    // position: absolute;
     height: 10px;
     background: linear-gradient(90deg, #ffffff, #ffffff);
     border-radius: 2px;

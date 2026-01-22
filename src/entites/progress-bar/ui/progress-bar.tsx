@@ -122,14 +122,15 @@ export const ProgressBar: React.FC<IProgressBar> = ({duration, videoRef, progres
             document.removeEventListener('mousemove', handleMouseMoveWrapper);
             document.removeEventListener('mouseup', handleMouseUpWrapper);
         };
-    }, [isDragging, duration, videoRef]); // Убрали старые обработчики
+    }, [isDragging, duration, videoRef]);
 
     useEffect(() => {
         if (!videoRef?.current) return;
         
         const videoElement = videoRef.current;
         
-        const updateBufferedRanges = () => {
+        const updateBufferedRanges = (e: any) => {
+            
             const fragments: IBufferedFragment[] = [];
             
             // Собираем все буферизированные фрагменты
@@ -144,7 +145,7 @@ export const ProgressBar: React.FC<IProgressBar> = ({duration, videoRef, progres
         };
         
         // Initial update
-        updateBufferedRanges();
+        // updateBufferedRanges();
         
         videoElement.addEventListener('progress', updateBufferedRanges);
         videoElement.addEventListener('loadeddata', updateBufferedRanges);
@@ -183,7 +184,7 @@ export const ProgressBar: React.FC<IProgressBar> = ({duration, videoRef, progres
             const fragment = fragments[i];
             const fragmentTime = fragment.end - fragment.start;
             const fragmentWidthPercent = (fragmentTime / duration) * 100;
-            const fragmentStartPercent = (fragment.start / duration) * 100;
+            // const fragmentStartPercent = (fragment.start / duration) * 100;
             
             if (currentTime < fragment.start) {
                 // Если не дошли до этого фрагмента, прерываем
@@ -228,6 +229,75 @@ export const ProgressBar: React.FC<IProgressBar> = ({duration, videoRef, progres
         return result;
     }, [videoRef, progress, isDragging, dragTime, fragments, duration]) // Добавили isDragging и dragTime в зависимости
 
+
+    // просчитываем буферизированные фрагменты
+    const bufferedFragmentsBar = useMemo(() => {
+        // Используем dragTime при перетаскивании
+        const currentTime = isDragging && dragTime !== null 
+            ? dragTime 
+            : videoRef.current?.currentTime || 0;
+        
+        const result = [];
+        
+        for (let i = 0; i < fragments.length; i++) {
+            const fragment = fragments[i];
+            const fragmentTime = fragment.end - fragment.start;
+            const fragmentWidthPercent = (fragmentTime / duration) * 100;
+            const fragmentStartPercent = (fragment.start / duration) * 100;
+            
+            // Если фрагмент уже полностью пройден, пропускаем
+            if (currentTime > fragment.end) {
+                continue;
+            }
+            
+            // Находим текущий или будущий фрагмент
+            if (currentTime >= fragment.start && currentTime < fragment.end) {
+                // Текущий фрагмент - заполняем от текущей позиции до конца фрагмента
+                
+                // Время от текущей позиции до конца фрагмента
+                const timeRemainingInFragment = fragment.end - currentTime;
+                
+                // Процент фрагмента, который осталось заполнить
+                const fillPercent = (timeRemainingInFragment / fragmentTime) * fragmentWidthPercent;
+                
+                // Позиция начала заливки (относительно всего прогрессбара)
+                const startPercent = ((currentTime - fragment.start) / fragmentTime) * fragmentWidthPercent;
+                
+                result.push(
+                    <div 
+                        key={`buffered-${i}`}
+                        className={styles.progressBuffered}
+                        style={{ 
+                            width: `${fillPercent}%`,
+                            left: `${fragmentStartPercent + startPercent}%`,
+                            position: 'absolute'
+                        }}
+                    />
+                );
+                 // Прерываем, так как нашли текущий фрагмент
+            }
+            
+            // Если фрагмент еще не начался
+            if (currentTime < fragment.start) {
+                // Закрашиваем весь фрагмент
+                result.push(
+                    <div 
+                        key={`buffered-${i}`}
+                        className={styles.progressBuffered}
+                        style={{ 
+                            width: `${fragmentWidthPercent}%`,
+                            left: `${fragmentStartPercent}%`,
+                            position: 'absolute'
+                        }}
+                    />
+                );
+            }
+        }
+        
+        return result;
+    }, [videoRef, isDragging, dragTime, fragments, duration, progress]);
+
+
     console.log('setBufferedFragments = ', bufferedFragments);
     
 
@@ -271,6 +341,9 @@ export const ProgressBar: React.FC<IProgressBar> = ({duration, videoRef, progres
                 </div>
                 <div className={styles.progressFilledContainer}>
                     {fragmentedFilledBar}
+                </div>
+                <div className={styles.progressFilledContainer}>
+                    {bufferedFragmentsBar}
                 </div>
             </div>
         </>
