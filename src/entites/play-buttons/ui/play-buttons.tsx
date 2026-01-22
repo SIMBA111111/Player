@@ -34,7 +34,7 @@ export const PlayButtons: React.FC<IPlayButtons> = ({videoRef, duration, isVisib
                 // className={isVisibleTools ? styles.rewindBtn : styles.rewindBtn_hidden} 
                 className={styles.rewindBtn} 
                 onClick={(e: any) => {
-                    handleRewind(videoRef, setProgress, duration)
+                    handleRewind(videoRef, setProgress, duration, context)
                 }}
             >
                 <img src="/images/png/forward10_Bold.png" alt="" height={30}/>
@@ -64,7 +64,7 @@ export const PlayButtons: React.FC<IPlayButtons> = ({videoRef, duration, isVisib
                 // className={isVisibleTools ? styles.forwardBtn : styles.forwardBtn_hidden} 
                 className={styles.forwardBtn} 
                 onClick={(e: any) => {
-                    handleForward(videoRef, setProgress, duration)
+                    handleForward(videoRef, setProgress, duration, context)
                 }}
             >
                 <img src="/images/png/rewind10_Bold.png" alt="" height={30}/>

@@ -74,43 +74,74 @@ export const usePlayerContext = () => {
 const VIDEODATA = {
   // url: '/videos/hls_output/output.m3u8',
   // duration: 4.766,
+  
+  
   // url: '/videos/sound/sound1440p.m3u8',
   // duration: 9.633,
+  
+  
   // url: '/videos/test3/master-playlist.m3u8',
   // duration: 42.333,
-  // url: '/videos/test2/outTest2.m3u8',
-  // duration: 85.333,
-  url: '/videos/test4/master-playlist.m3u8',
-  duration: 9.585,
+  
+  
+  url: '/videos/test2/outTest2.m3u8',
+  duration: 85.333,
+
   fragments : [
     {
       start: 0.000,
-      end: 2.000,
+      end: 40.000,
       title: 'не начало'
     },
     {
-      start: 2.000,
-      end: 4.000,
+      start: 40.000,
+      end: 70.000,
       title: 'экспозиция'
     },
     {
-      start: 4.000,
-      end: 7.000,
+      start: 70.000,
+      end: 75.000,
       title: 'контент'
     },
     {
-      start: 7.000,
-      end: 9.585,
+      start: 75.000,
+      end: 85.333,
       title: 'концовка'
     },
   ]
+
+
+  // url: '/videos/test4/master-playlist.m3u8',
+  // duration: 9.585,
+  // fragments : [
+  //   {
+  //     start: 0.000,
+  //     end: 2.000,
+  //     title: 'не начало'
+  //   },
+  //   {
+  //     start: 2.000,
+  //     end: 4.000,
+  //     title: 'экспозиция'
+  //   },
+  //   {
+  //     start: 4.000,
+  //     end: 7.000,
+  //     title: 'контент'
+  //   },
+  //   {
+  //     start: 7.000,
+  //     end: 9.585,
+  //     title: 'концовка'
+  //   },
+  // ]
 }
 
 export default function Home() {
 
   const videoRef = useRef<HTMLVideoElement>(null)
   
-  const hls = new Hls({startLevel: -1, maxBufferLength: 3, lowLatencyMode: false, maxBufferSize: 10 * 1000 * 1000})
+  const hls = new Hls({startLevel: -1, maxBufferLength: 20, lowLatencyMode: false, maxBufferSize: 100 * 1000 * 1000})
 
   
   

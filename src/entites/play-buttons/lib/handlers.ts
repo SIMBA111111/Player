@@ -10,18 +10,21 @@ export const handlePlayPause = (videoRef: RefObject<HTMLVideoElement | null>, se
   }
 }
 
-export const handleForward = (videoRef: RefObject<HTMLVideoElement | null>, setProgress: (progres: number) => void, duration: number) => {
+export const handleForward = (videoRef: RefObject<HTMLVideoElement | null>, setProgress: (progres: number) => void, duration: number, context: any) => {
     if(videoRef.current) {
         const newTime = videoRef.current?.currentTime + 2
+        context.hls.startLoad(newTime);
         videoRef.current.currentTime = newTime
         setProgress(newTime / duration * 100) 
     }
 }
 
-export const handleRewind = (videoRef: RefObject<HTMLVideoElement | null>, setProgress: (progres: number) => void, duration: number) => {
+export const handleRewind = (videoRef: RefObject<HTMLVideoElement | null>, setProgress: (progres: number) => void, duration: number, context: any) => {
         if(videoRef.current) {
         const newTime = videoRef.current?.currentTime - 2
+        context.hls.startLoad(newTime);
         videoRef.current.currentTime = newTime
+
         setProgress(newTime / duration * 100) 
     }
 }

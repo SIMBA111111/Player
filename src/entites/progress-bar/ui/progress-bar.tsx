@@ -108,7 +108,6 @@ export const ProgressBar: React.FC<IProgressBar> = ({duration, videoRef, progres
             // если до клика или перетаскивания была пауза - также ставим паузу. Если был плэй - продолжаем
             // однако, при перетаскивании всегда ставится пауза, соответсвенно, после перетаскивания всегда будет оставаться пазуа
             videoRef.current.paused ? context.setIsPaused(true) : context.setIsPaused(false) 
-
             
             setHoverTime(0);
             setDragTime(null);
@@ -231,71 +230,81 @@ export const ProgressBar: React.FC<IProgressBar> = ({duration, videoRef, progres
 
 
     // просчитываем буферизированные фрагменты
-    const bufferedFragmentsBar = useMemo(() => {
-        // Используем dragTime при перетаскивании
-        const currentTime = isDragging && dragTime !== null 
-            ? dragTime 
-            : videoRef.current?.currentTime || 0;
+const bufferedFragmentsBar = useMemo(() => {
+    const currentTime = isDragging && dragTime !== null 
+        ? dragTime 
+        : videoRef.current?.currentTime || 0;
+    
+    const result = [];
+    
+    // Проходим по всем буферизированным диапазонам
+    for (let i = 0; i < bufferedFragments.length; i++) {
+        const buffered = bufferedFragments[i];
         
-        const result = [];
-        
-        for (let i = 0; i < fragments.length; i++) {
-            const fragment = fragments[i];
-            const fragmentTime = fragment.end - fragment.start;
-            const fragmentWidthPercent = (fragmentTime / duration) * 100;
-            const fragmentStartPercent = (fragment.start / duration) * 100;
+        // Находим все фрагменты, которые пересекаются с этим буфером
+        for (let j = 0; j < fragments.length; j++) {
+            const fragment = fragments[j];
             
-            // Если фрагмент уже полностью пройден, пропускаем
+            // Пропускаем фрагменты полностью позади текущего времени
             if (currentTime > fragment.end) {
                 continue;
             }
             
-            // Находим текущий или будущий фрагмент
-            if (currentTime >= fragment.start && currentTime < fragment.end) {
-                // Текущий фрагмент - заполняем от текущей позиции до конца фрагмента
-                
-                // Время от текущей позиции до конца фрагмента
-                const timeRemainingInFragment = fragment.end - currentTime;
-                
-                // Процент фрагмента, который осталось заполнить
-                const fillPercent = (timeRemainingInFragment / fragmentTime) * fragmentWidthPercent;
-                
-                // Позиция начала заливки (относительно всего прогрессбара)
-                const startPercent = ((currentTime - fragment.start) / fragmentTime) * fragmentWidthPercent;
-                
-                result.push(
-                    <div 
-                        key={`buffered-${i}`}
-                        className={styles.progressBuffered}
-                        style={{ 
-                            width: `${fillPercent}%`,
-                            left: `${fragmentStartPercent + startPercent}%`,
-                            position: 'absolute'
-                        }}
-                    />
-                );
-                 // Прерываем, так как нашли текущий фрагмент
-            }
+            // Находим пересечение буфера и фрагмента
+            const overlapStart = Math.max(fragment.start, buffered.start);
+            const overlapEnd = Math.min(fragment.end, buffered.end);
             
-            // Если фрагмент еще не начался
-            if (currentTime < fragment.start) {
-                // Закрашиваем весь фрагмент
-                result.push(
-                    <div 
-                        key={`buffered-${i}`}
-                        className={styles.progressBuffered}
-                        style={{ 
-                            width: `${fragmentWidthPercent}%`,
-                            left: `${fragmentStartPercent}%`,
-                            position: 'absolute'
-                        }}
-                    />
-                );
+            if (overlapStart < overlapEnd) {
+                // Есть пересечение
+                const fragmentTime = fragment.end - fragment.start;
+                const fragmentWidthPercent = (fragmentTime / duration) * 100;
+                const fragmentStartPercent = (fragment.start / duration) * 100;
+                
+                // Если это текущий фрагмент и буфер начинается до текущего времени
+                if (currentTime >= fragment.start && currentTime < fragment.end && overlapStart < currentTime) {
+                    // Закрашиваем только часть после currentTime
+                    const visualStart = Math.max(overlapStart, currentTime);
+                    const visualEnd = overlapEnd;
+                    
+                    if (visualStart < visualEnd) {
+                        const bufferedPercent = ((visualEnd - visualStart) / fragmentTime) * fragmentWidthPercent;
+                        const currentPositionInFragment = ((visualStart - fragment.start) / fragmentTime) * fragmentWidthPercent;
+                        
+                        result.push(
+                            <div 
+                                key={`buffered-${i}-${j}`}
+                                className={styles.progressBuffered}
+                                style={{ 
+                                    width: `${bufferedPercent}%`,
+                                    left: `${fragmentStartPercent + currentPositionInFragment}%`,
+                                    position: 'absolute'
+                                }}
+                            />
+                        );
+                    }
+                } else {
+                    // Будущие фрагменты или буфер полностью после currentTime
+                    const bufferedPercent = ((overlapEnd - overlapStart) / fragmentTime) * fragmentWidthPercent;
+                    const startInFragment = ((overlapStart - fragment.start) / fragmentTime) * fragmentWidthPercent;
+                    
+                    result.push(
+                        <div 
+                            key={`buffered-${i}-${j}`}
+                            className={styles.progressBuffered}
+                            style={{ 
+                                width: `${bufferedPercent}%`,
+                                left: `${fragmentStartPercent + startInFragment}%`,
+                                position: 'absolute'
+                            }}
+                        />
+                    );
+                }
             }
         }
-        
-        return result;
-    }, [videoRef, isDragging, dragTime, fragments, duration, progress]);
+    }
+    
+    return result;
+}, [videoRef, isDragging, dragTime, fragments, duration, bufferedFragments]);
 
 
     console.log('setBufferedFragments = ', bufferedFragments);
@@ -336,13 +345,13 @@ export const ProgressBar: React.FC<IProgressBar> = ({duration, videoRef, progres
                     }
                 }}
             >
-                <div className={styles.progressBackgroundContainer}>
+                <div className={styles.progressBackground}>
                     {fragmentedProgressBar}
                 </div>
                 <div className={styles.progressFilledContainer}>
                     {fragmentedFilledBar}
                 </div>
-                <div className={styles.progressFilledContainer}>
+                <div className={styles.progressBufferedContainer}>
                     {bufferedFragmentsBar}
                 </div>
             </div>
