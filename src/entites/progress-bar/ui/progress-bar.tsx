@@ -48,21 +48,32 @@ export const ProgressBar: React.FC<IProgressBar> = ({
         const filledSegments: JSX.Element[] = [];
         const bufferedSegments: JSX.Element[] = [];
 
-        // 1. Фоновые сегменты (всегда отображаются все)
+        // Вычисляем gap в процентах (например, 1% от общей ширины)
+        const GAP_PERCENT = 0.3; // небольшой gap в процентах
+
+        // 1. Фоновые сегменты
+        let accumulatedLeft = 0;
         fragments.forEach((fragment: IFragment, index: number) => {
             const fragmentTime = fragment.end - fragment.start;
-            const fragmentWidth = (fragmentTime / duration) * 100;
+            const fragmentWidthPercent = (fragmentTime / duration) * 100;
 
             backgroundSegments.push(
                 <div 
                     key={`bg-${index}`} 
                     className={styles.progressBackground} 
-                    style={{width: `${fragmentWidth.toFixed(4)}%`}}
+                    style={{
+                        width: `${fragmentWidthPercent}%`,
+                        left: `${accumulatedLeft}%`
+                    }}
                 />
             );
+
+            // Увеличиваем накопленную позицию для следующего фрагмента
+            accumulatedLeft += fragmentWidthPercent + GAP_PERCENT;
         });
 
         // 2. Заполненные (пройденные) сегменты
+        accumulatedLeft = 0;
         for (let i = 0; i < fragments.length; i++) {
             const fragment = fragments[i];
             const fragmentTime = fragment.end - fragment.start;
@@ -79,7 +90,10 @@ export const ProgressBar: React.FC<IProgressBar> = ({
                     <div 
                         key={`filled-${i}`}
                         className={styles.progressFilled}
-                        style={{ width: `${fillPercent}%` }}
+                        style={{ 
+                            width: `${fillPercent}%`,
+                            left: `${accumulatedLeft}%`
+                        }}
                     />
                 );
                 break;
@@ -89,9 +103,13 @@ export const ProgressBar: React.FC<IProgressBar> = ({
                     <div 
                         key={`filled-${i}`}
                         className={styles.progressFilled}
-                        style={{ width: `${fragmentWidthPercent}%` }}
+                        style={{ 
+                            width: `${fragmentWidthPercent}%`,
+                            left: `${accumulatedLeft}%`
+                        }}
                     />
                 );
+                accumulatedLeft += fragmentWidthPercent + GAP_PERCENT;
             }
         }
 
@@ -99,9 +117,10 @@ export const ProgressBar: React.FC<IProgressBar> = ({
         for (let i = 0; i < bufferedFragments.length; i++) {
             const buffered = bufferedFragments[i];
             
-            // Находим пересечения с логическими фрагментами
             for (let j = 0; j < fragments.length; j++) {
                 const fragment = fragments[j];
+                const fragmentStartPercent = (fragment.start / duration) * 100;
+                const fragmentEndPercent = (fragment.end / duration) * 100;
                 
                 // Пропускаем фрагменты позади текущего времени
                 if (currentTime > fragment.end) continue;
@@ -112,7 +131,14 @@ export const ProgressBar: React.FC<IProgressBar> = ({
                 if (overlapStart < overlapEnd) {
                     const fragmentTime = fragment.end - fragment.start;
                     const fragmentWidthPercent = (fragmentTime / duration) * 100;
-                    const fragmentStartPercent = (fragment.start / duration) * 100;
+                    
+                    // Вычисляем позицию этого фрагмента с учетом gap
+                    let fragmentLeftPercent = 0;
+                    for (let k = 0; k < j; k++) {
+                        const prevFragment = fragments[k];
+                        const prevFragmentTime = prevFragment.end - prevFragment.start;
+                        fragmentLeftPercent += (prevFragmentTime / duration) * 100 + GAP_PERCENT;
+                    }
                     
                     let bufferedPercent: number;
                     let leftPosition: number;
@@ -124,7 +150,7 @@ export const ProgressBar: React.FC<IProgressBar> = ({
                         const currentPosInFragment = ((visualStart - fragment.start) / fragmentTime) * fragmentWidthPercent;
                         
                         bufferedPercent = bufferedWidth;
-                        leftPosition = fragmentStartPercent + currentPosInFragment;
+                        leftPosition = fragmentLeftPercent + currentPosInFragment;
                     } 
                     // Будущие фрагменты
                     else {
@@ -132,7 +158,7 @@ export const ProgressBar: React.FC<IProgressBar> = ({
                         const startInFragment = ((overlapStart - fragment.start) / fragmentTime) * fragmentWidthPercent;
                         
                         bufferedPercent = bufferedWidth;
-                        leftPosition = fragmentStartPercent + startInFragment;
+                        leftPosition = fragmentLeftPercent + startInFragment;
                     }
                     
                     if (bufferedPercent > 0) {
@@ -142,8 +168,7 @@ export const ProgressBar: React.FC<IProgressBar> = ({
                                 className={styles.progressBuffered}
                                 style={{ 
                                     width: `${bufferedPercent}%`,
-                                    left: `${leftPosition}%`,
-                                    position: 'absolute'
+                                    left: `${leftPosition}%`
                                 }}
                             />
                         );
@@ -164,9 +189,10 @@ export const ProgressBar: React.FC<IProgressBar> = ({
         dragTime, 
         videoRef, 
         bufferedFragments,
-        progress // зависимость на случай если нужно пересчитать при изменении progress
+        progress
     ]);
 
+    // ... остальной код без изменений
     useEffect(() => {
         const video = videoRef.current;
         if (!video) return;
@@ -297,15 +323,10 @@ export const ProgressBar: React.FC<IProgressBar> = ({
                     }
                 }}
             >
-                <div className={styles.progressBackgroundContainer}>
-                    {progressSegments.backgroundSegments}
-                </div>
-                <div className={styles.progressFilledContainer}>
-                    {progressSegments.filledSegments}
-                </div>
-                <div className={styles.progressBufferedContainer}>
-                    {progressSegments.bufferedSegments}
-                </div>
+                {/* Все элементы абсолютно позиционированы с одинаковым left */}
+                {progressSegments.backgroundSegments}
+                {progressSegments.bufferedSegments}
+                {progressSegments.filledSegments}
             </div>
         </>
     );
