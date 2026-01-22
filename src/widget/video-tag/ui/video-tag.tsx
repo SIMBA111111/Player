@@ -1,11 +1,15 @@
 'use client'
 
 import { useRef, useState } from "react"
+
 import { PlayerTools } from "@/features/player-tools/ui/player-tools"
+import { usePlayerContext } from "@/app/page"
+
 import { VideoTagHandlers } from "../lib/handlers"
 import { IVideoTag } from "../model/video-tag.interface"
+
 import styles from './styles.module.scss'
-import { usePlayerContext } from "@/app/page"
+
 
 export const VideoTag: React.FC<IVideoTag> = ({hls, duration, videoRef, fragments}) => {
     const [isVisibleTools, setIsVisibleTools] = useState(false)

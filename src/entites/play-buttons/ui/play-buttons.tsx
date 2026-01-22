@@ -2,10 +2,11 @@
 
 import { RefObject } from "react"
 
-import { handleRewind, handlePlayPause, handleForward } from "../lib/handlers"
+import { handleRewind, handleForward } from "../lib/handlers"
+
+import { usePlayerContext } from "@/app/page"
 
 import styles from './styles.module.scss'
-import { usePlayerContext } from "@/app/page"
 
 
 interface IPlayButtons {
@@ -13,8 +14,6 @@ interface IPlayButtons {
     duration: number;
     isVisibleTools: boolean
     setProgress: (progress: number) => void;
-    // paused: boolean;
-    // setPaused: (paused: boolean) => void
 }   
 
 export const PlayButtons: React.FC<IPlayButtons> = ({videoRef, duration, isVisibleTools, setProgress}) => {
@@ -44,8 +43,6 @@ export const PlayButtons: React.FC<IPlayButtons> = ({videoRef, duration, isVisib
                 // className={isVisibleTools ? styles.playBtn : styles.playBtn_hidden} 
                 className={styles.playBtnWrap} 
                 onClick={(e: any) => {
-                    // e.stopPropagation()
-                    // e.preventDefault()
                     context.setIsPaused((prev: boolean) => !prev)
                 }}
             >

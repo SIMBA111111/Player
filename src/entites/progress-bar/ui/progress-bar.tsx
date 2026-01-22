@@ -60,7 +60,7 @@ export const ProgressBar: React.FC<IProgressBar> = ({
             backgroundSegments.push(
                 <div 
                     key={`bg-${index}`} 
-                    className={styles.progressBackground} 
+                    className={`${styles.progressBackground} ${styles.progressFragment}`} 
                     style={{
                         width: `${fragmentWidthPercent}%`,
                         left: `${accumulatedLeft}%`
@@ -102,7 +102,7 @@ export const ProgressBar: React.FC<IProgressBar> = ({
                 filledSegments.push(
                     <div 
                         key={`filled-${i}`}
-                        className={styles.progressFilled}
+                        className={`${styles.progressFilled} ${styles.progressFragment}`}
                         style={{ 
                             width: `${fragmentWidthPercent}%`,
                             left: `${accumulatedLeft}%`
@@ -119,8 +119,6 @@ export const ProgressBar: React.FC<IProgressBar> = ({
             
             for (let j = 0; j < fragments.length; j++) {
                 const fragment = fragments[j];
-                const fragmentStartPercent = (fragment.start / duration) * 100;
-                const fragmentEndPercent = (fragment.end / duration) * 100;
                 
                 // Пропускаем фрагменты позади текущего времени
                 if (currentTime > fragment.end) continue;
@@ -165,7 +163,7 @@ export const ProgressBar: React.FC<IProgressBar> = ({
                         bufferedSegments.push(
                             <div 
                                 key={`buffered-${i}-${j}`}
-                                className={styles.progressBuffered}
+                                className={`${styles.progressBuffered} ${styles.progressFragment}`}
                                 style={{ 
                                     width: `${bufferedPercent}%`,
                                     left: `${leftPosition}%`

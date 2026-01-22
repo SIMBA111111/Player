@@ -27,20 +27,9 @@ export const VideoTagHandlers = (
         setIsVisibleTools(true);
     };
 
-    const handlePlayPause = (videoRef: RefObject<HTMLVideoElement | null>, setPaused: (paused: boolean) => void) => {
-    if (videoRef.current?.paused) {
-        videoRef.current?.play()
-        setPaused(false)
-    } else {
-        videoRef.current?.pause()
-        setPaused(true)
-    }
-    }
-
     return {
         handleMouseMove,
         handleMouseLeave,
         handleMouseOver,
-        handlePlayPause
     };
 };

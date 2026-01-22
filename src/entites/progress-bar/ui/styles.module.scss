@@ -27,6 +27,13 @@
     }
 }
 
+.progressFragment {
+    &:hover {
+        top: -5px;
+        height: 12px;
+    }
+}
+
 // Все сегменты используют одинаковые стили позиционирования
 .progressBackground {
     position: absolute;

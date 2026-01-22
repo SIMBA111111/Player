@@ -7,8 +7,6 @@ export const handleProgressClick = (
     videoRef: RefObject<any>, 
     progressContainerRef: RefObject<any>,
 ) => {
-    console.log('handleProgressClick');
-    
     if (!videoRef.current || !duration || !progressContainerRef.current) return;
 
     const progressContainer = progressContainerRef.current;
