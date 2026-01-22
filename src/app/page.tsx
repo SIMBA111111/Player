@@ -119,7 +119,12 @@ export default function Home() {
 
   const videoRef = useRef<HTMLVideoElement>(null)
   
-  const hls = new Hls({startLevel: -1, maxBufferLength: 20, lowLatencyMode: false, maxBufferSize: 100 * 1000 * 1000})
+  const hls = new Hls({startLevel: -1, maxBufferLength: 5, lowLatencyMode: false, maxBufferSize: 100 * 1000 * 1000,
+        // enableStreaming: true,
+    // progressive: true,
+    maxBufferHole: 0.5,
+    // maxFragLookUpTolerance: 0.25,
+  })
 
   
   

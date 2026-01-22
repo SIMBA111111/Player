@@ -224,59 +224,33 @@ export const ProgressBar: React.FC<IProgressBar> = ({
             }
         };
 
-const handleMouseUpWrapper = (e: MouseEvent) => {
-    if (!progressContainerRef.current || !videoRef.current || !duration || !context.hls) return;
-    
-    const rect = progressContainerRef.current.getBoundingClientRect();
-    const clickPosition = Math.min(Math.max(e.clientX - rect.left, 0), rect.width);
-    const clickPercentage = clickPosition / rect.width;
-    const newTime = clickPercentage * duration;
-    
-    console.log(`Seeking to: ${newTime.toFixed(2)}s`);
-    
-    // 1. Останавливаем текущую загрузку
-    context.hls.stopLoad();
-    
-    // 2. Сбрасываем состояние буфера
-    setBufferedFragments([]);
-    
-    // 3. Устанавливаем новое время
-    videoRef.current.currentTime = newTime;
-    
-    // 4. Запускаем загрузку с новой позиции
-    context.hls.startLoad(newTime);
-    
-    // 5. Ждем немного и принудительно обновляем буфер
-    setTimeout(() => {
-        if (videoRef.current) {
-            const fragments: IBufferedFragment[] = [];
-            for (let index = 0; index < videoRef.current.buffered.length; index++) {
-                fragments.push({
-                    start: videoRef.current.buffered.start(index),
-                    end: videoRef.current.buffered.end(index)
-                });
-            }
-            setBufferedFragments(fragments);
-        }
-    }, 200);
-    
-    // 6. Обновляем состояние паузы
-    if (!context.isPaused) {
-        videoRef.current.play()
-            .then(() => context.setIsPaused(false))
-            .catch((error: any) => {
-                console.log('Autoplay prevented after seek');
-                context.setIsPaused(true);
-            });
-    } else {
-        context.setIsPaused(true);
-    }
-    
-    // 7. Сбрасываем состояние
-    setHoverTime(0);
-    setDragTime(null);
-    setIsDragging(false);
-};
+        const handleMouseUpWrapper = (e: MouseEvent) => {
+            if (!progressContainerRef.current || !videoRef.current || !duration || !context.hls) return;
+            
+            const rect = progressContainerRef.current.getBoundingClientRect();
+            const clickPosition = Math.min(Math.max(e.clientX - rect.left, 0), rect.width);
+            const clickPercentage = clickPosition / rect.width;
+            const newTime = clickPercentage * duration;
+            
+            console.log(`Seeking to: ${newTime.toFixed(2)}s`);
+            
+            // 1. Останавливаем текущую загрузку
+            // context.hls.stopLoad();
+            
+            // 2. Устанавливаем новое время
+            videoRef.current.currentTime = newTime;
+            
+            // 3. Начинаем загрузку с новой позиции
+            // context.hls.startLoad(newTime);
+            
+            // 4. Сбрасываем состояние буфера в компоненте
+            // setBufferedFragments([]);
+            
+            // 6. Сбрасываем состояние
+            setHoverTime(0);
+            setDragTime(null);
+            setIsDragging(false);
+        };
 
         document.addEventListener('mousemove', handleMouseMoveWrapper, {passive: true});
         document.addEventListener('mouseup', handleMouseUpWrapper, {passive: true});
