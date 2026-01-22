@@ -5,9 +5,11 @@ import { RefObject, useCallback, useEffect, useMemo, useRef, useState } from "re
 import { getHHSStime } from "@/shared/utils/getHHSStime"
 import { IFragment } from "@/widget/video-tag/model/video-tag.interface";
 
-import { handleDocumentMouseMove, handleDocumentMouseUp, handleMouseDown, handleMouseOverOnProgressBar, handleProgressClick } from "../lib/handlers"
+import {
+    handleMouseDown, handleMouseOverOnProgressBar, handleProgressClick } from "../lib/handlers"
 
 import styles from './styles.module.scss'
+import { usePlayerContext } from "@/app/page";
 
 
 interface IProgressBar {
@@ -16,7 +18,6 @@ interface IProgressBar {
     progress: number;
     setProgress: (progress: number) => void;
     isVisibleTools: boolean;
-    setPaused: (paused: boolean) => void
     fragments: IFragment[]
 }
 
@@ -25,20 +26,21 @@ interface IBufferedFragment {
     end: number;
 }
 
-export const ProgressBar: React.FC<IProgressBar> = ({duration, videoRef, progress, setProgress, isVisibleTools, setPaused, fragments}) => {
+export const ProgressBar: React.FC<IProgressBar> = ({duration, videoRef, progress, setProgress, isVisibleTools, fragments}) => {
     const [hoverTime, setHoverTime] = useState<number>(0);
     const [isDragging, setIsDragging] = useState(false);
     const [bufferedFragments, setBufferedFragments] = useState<IBufferedFragment[]>([]);
     const [dragTime, setDragTime] = useState<number | null>(null); // Новое состояние для времени при перетаскивании
     const progressContainerRef = useRef<HTMLDivElement>(null);
+    const context = usePlayerContext();
 
-    const handleMouseMove = useCallback((e: MouseEvent) => {
-        handleDocumentMouseMove(e, duration, setProgress, setHoverTime, videoRef, progressContainerRef);
-    }, [duration, videoRef]);
+    // const handleMouseMove = useCallback((e: MouseEvent) => {
+    //     handleDocumentMouseMove(e, duration, setProgress, setHoverTime, videoRef, progressContainerRef);
+    // }, [duration, videoRef]);
 
-    const handleMouseUp = useCallback((e: MouseEvent) => {
-        handleDocumentMouseUp(e, setHoverTime, setIsDragging, videoRef, duration, progressContainerRef);
-    }, [duration, videoRef]);
+    // const handleMouseUp = useCallback((e: MouseEvent) => {
+    //     handleDocumentMouseUp(e, setHoverTime, setIsDragging, videoRef, duration, progressContainerRef);
+    // }, [duration, videoRef]);
 
     useEffect(() => {
         const video = videoRef.current;
@@ -57,7 +59,7 @@ export const ProgressBar: React.FC<IProgressBar> = ({duration, videoRef, progres
         return () => {
             video.removeEventListener('timeupdate', updateProgress);
         };
-    }, [videoRef, duration, isDragging]); // Добавили isDragging в зависимости
+    }, [videoRef, duration, isDragging]);
 
     // Эффект для подписки на события мыши на document при перетаскивании
     useEffect(() => {
@@ -71,6 +73,11 @@ export const ProgressBar: React.FC<IProgressBar> = ({duration, videoRef, progres
             const clickPercentage = clickPosition / rect.width;
             
             const newTime = clickPercentage * duration;
+            
+            // при перетаскивании мотаем видео
+            videoRef.current.currentTime = newTime
+            
+            context.setIsPaused(true)
             
             // Обновляем время перетаскивания
             setDragTime(newTime);
@@ -97,7 +104,11 @@ export const ProgressBar: React.FC<IProgressBar> = ({duration, videoRef, progres
             
             // Перематываем видео
             videoRef.current.currentTime = newTime;
-            videoRef.current.play().catch(console.error);
+
+            // если до клика или перетаскивания была пауза - также ставим паузу. Если был плэй - продолжаем
+            // однако, при перетаскивании всегда ставится пауза, соответсвенно, после перетаскивания всегда будет оставаться пазуа
+            videoRef.current.paused ? context.setIsPaused(true) : context.setIsPaused(false) 
+
             
             setHoverTime(0);
             setDragTime(null);
@@ -217,6 +228,9 @@ export const ProgressBar: React.FC<IProgressBar> = ({duration, videoRef, progres
         return result;
     }, [videoRef, progress, isDragging, dragTime, fragments, duration]) // Добавили isDragging и dragTime в зависимости
 
+    console.log('setBufferedFragments = ', bufferedFragments);
+    
+
     return (
         <>
             <div 
@@ -239,7 +253,7 @@ export const ProgressBar: React.FC<IProgressBar> = ({duration, videoRef, progres
                     }
                 }}
                 onMouseDown={(e: any) => { 
-                    handleMouseDown(e, setIsDragging, setPaused);
+                    handleMouseDown(e, setIsDragging);
                 }}
                 onMouseLeave={() => {
                     if (!isDragging) {

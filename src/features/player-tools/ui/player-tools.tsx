@@ -22,8 +22,6 @@ export const PlayerTools: React.FC<IPlayerTools> = ({
     videoRef, 
     isVisibleTools, 
     setIsVisibleTools,
-    paused,
-    setPaused,
     fragments
 }) => {
     const [progress, setProgress] = useState(0);
@@ -40,7 +38,6 @@ export const PlayerTools: React.FC<IPlayerTools> = ({
                     progress={progress} 
                     setProgress={setProgress} 
                     isVisibleTools={isVisibleTools} 
-                    setPaused={setPaused}
                     fragments={fragments}    
                 />
 
@@ -49,7 +46,7 @@ export const PlayerTools: React.FC<IPlayerTools> = ({
                 
                 <div className={styles.toolsArea}>
 
-                    <PlayButtons videoRef={videoRef} duration={duration} isVisibleTools={isVisibleTools} paused={paused} setPaused={setPaused} setProgress={setProgress}/>
+                    <PlayButtons videoRef={videoRef} duration={duration} isVisibleTools={isVisibleTools} setProgress={setProgress}/>
 
                     <SoundAndTimeVolume videoRef={videoRef} isVisibleTools={isVisibleTools} duration={duration}/>
 

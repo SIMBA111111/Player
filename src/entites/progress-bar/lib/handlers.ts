@@ -5,7 +5,7 @@ export const handleProgressClick = (
     duration: number, 
     setProgress: any, 
     videoRef: RefObject<any>, 
-    progressContainerRef: RefObject<any>
+    progressContainerRef: RefObject<any>,
 ) => {
     console.log('handleProgressClick');
     
@@ -21,7 +21,7 @@ export const handleProgressClick = (
     const newTime = clickPercentage * duration;
     
     videoRef.current.currentTime = newTime;
-    
+
     const newProgress = clickPercentage * 100;
     setProgress(newProgress);
 };
@@ -29,71 +29,69 @@ export const handleProgressClick = (
 export const handleMouseDown = (
     e: React.MouseEvent<HTMLDivElement>, 
     setIsDragging: any, 
-    setPaused: (paused: boolean) => void
 ) => {
     console.log('handleMouseDown');
     e.preventDefault();
     setIsDragging(true);
-    setPaused(true);
 };
 
-export const handleDocumentMouseMove = (
-    e: MouseEvent, 
-    duration: number, 
-    setProgress: any, 
-    setTimeHover: any, 
-    videoRef: RefObject<any>, 
-    progressContainerRef: RefObject<any>
-) => {
-    console.log('handleDocumentMouseMove');
+// export const handleDocumentMouseMove = (
+//     e: MouseEvent, 
+//     duration: number, 
+//     setProgress: any, 
+//     setTimeHover: any, 
+//     videoRef: RefObject<any>, 
+//     progressContainerRef: RefObject<any>
+// ) => {
+//     console.log('handleDocumentMouseMove');
 
-    if (!videoRef.current || !duration || !progressContainerRef.current) return;
+//     if (!videoRef.current || !duration || !progressContainerRef.current) return;
     
-    const timeHoverPosition = document.getElementById('timeHover');
+//     const timeHoverPosition = document.getElementById('timeHover');
     
-    const progressContainer = progressContainerRef.current;
-    const rect = progressContainer.getBoundingClientRect();
+//     const progressContainer = progressContainerRef.current;
+//     const rect = progressContainer.getBoundingClientRect();
     
-    // Вычисляем позицию относительно прогресс-бара
-    const clickPosition = Math.min(Math.max(e.clientX - rect.left, 0), rect.width);
-    const clickPercentage = clickPosition / rect.width;
+//     // Вычисляем позицию относительно прогресс-бара
+//     const clickPosition = Math.min(Math.max(e.clientX - rect.left, 0), rect.width);
+//     const clickPercentage = clickPosition / rect.width;
     
-    if (timeHoverPosition && timeHoverPosition.style) {
-        timeHoverPosition.style.left = `${String(clickPosition)}px`;
-    }
+//     if (timeHoverPosition && timeHoverPosition.style) {
+//         timeHoverPosition.style.left = `${String(clickPosition)}px`;
+//     }
 
-    const newProgress = clickPercentage * 100;
+//     const newProgress = clickPercentage * 100;
     
-    setTimeHover(clickPercentage * duration);
-    setProgress(newProgress);
-};
+//     setTimeHover(clickPercentage * duration);
+//     setProgress(newProgress);
+// };
 
-export const handleDocumentMouseUp = (
-    e: MouseEvent, 
-    setTimeHover: any, 
-    setIsDragging: any, 
-    videoRef: RefObject<any>, 
-    duration: number, 
-    progressContainerRef: RefObject<any>
-) => {
-    console.log('handleDocumentMouseUp');
-    if (!videoRef.current || !duration || !progressContainerRef.current) return;
+// export const handleDocumentMouseUp = (
+//     e: MouseEvent, 
+//     setTimeHover: any, 
+//     setIsDragging: any, 
+//     videoRef: RefObject<any>, 
+//     duration: number, 
+//     progressContainerRef: RefObject<any>
+// ) => {
+//     console.log('handleDocumentMouseUp');
+//     if (!videoRef.current || !duration || !progressContainerRef.current) return;
     
-    const progressContainer = progressContainerRef.current;
-    const rect = progressContainer.getBoundingClientRect();
+//     const progressContainer = progressContainerRef.current;
+//     const rect = progressContainer.getBoundingClientRect();
     
-    const clickPosition = Math.min(Math.max(e.clientX - rect.left, 0), rect.width);
-    const clickPercentage = clickPosition / rect.width;
+//     const clickPosition = Math.min(Math.max(e.clientX - rect.left, 0), rect.width);
+//     const clickPercentage = clickPosition / rect.width;
     
-    const newTime = clickPercentage * duration;
+//     const newTime = clickPercentage * duration;
     
-    // Перематываем видео
-    videoRef.current.currentTime = newTime;
+//     // Перематываем видео
+//     videoRef.current.currentTime = newTime;
     
-    setTimeHover(0);
-    setIsDragging(false);
-    videoRef.current?.play();
-};
+//     setTimeHover(0);
+//     setIsDragging(false);
+//     videoRef.current?.play();
+// };
 
 export const handleMouseOverOnProgressBar = (
     e: any, 

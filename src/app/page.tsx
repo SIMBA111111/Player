@@ -1,9 +1,75 @@
 'use client'
 
 import Hls from "hls.js";
-import { useEffect, useRef, useState } from "react";
+import { createContext, RefObject, useCallback, useContext, useEffect, useRef, useState } from "react";
 
 import { VideoTag } from "@/widget/video-tag/ui/video-tag";
+import React from "react";
+
+interface IPlayerContext {
+  isPaused: boolean;
+  setIsPaused: React.Dispatch<React.SetStateAction<boolean>>;
+  hls: Hls
+  // handlePlayPause: (videoRef: RefObject<HTMLVideoElement | null>) => void;
+}
+
+export const playerContext = createContext<IPlayerContext | null>(null);
+
+interface PlayerProviderProps {
+  children: React.ReactNode;
+  videoRef: RefObject<HTMLVideoElement | null>
+  hls: Hls
+}
+
+const PlayerProvider: React.FC<PlayerProviderProps> = ({ children, videoRef, hls }) => {
+  const [isPaused, setIsPaused] = useState<boolean>(true); // Начинаем с паузы
+
+  // if(!videoRef.current) {
+  //   throw Error
+  // } 
+
+  console.log('PlayerProvider isPaused ?', isPaused);
+  
+
+  if (isPaused) {
+    videoRef?.current?.pause()
+  } else {
+    videoRef?.current?.play()
+  }
+
+  // const handlePlayPause = useCallback((videoRef: RefObject<HTMLVideoElement | null>) => {
+  //   if (videoRef.current) {
+  //     if (videoRef.current.paused) {
+  //       videoRef.current.play();
+  //       setIsPaused(false);
+  //     } else {
+  //       videoRef.current.pause();
+  //       setIsPaused(true);
+  //     }
+  //   }
+  // }, []);
+
+  const value: IPlayerContext = {
+    isPaused,
+    setIsPaused,
+    hls
+    // handlePlayPause
+  };
+
+  return (
+    <playerContext.Provider value={value}>
+      {children}
+    </playerContext.Provider>
+  );
+};
+
+export const usePlayerContext = () => {
+  const context = useContext(playerContext);
+  if (!context) {
+    throw new Error('usePlayerContext must be used within PlayerProvider');
+  }
+  return context;
+};
 
 const VIDEODATA = {
   // url: '/videos/hls_output/output.m3u8',
@@ -44,9 +110,9 @@ export default function Home() {
 
   const videoRef = useRef<HTMLVideoElement>(null)
   
-  const hls = new Hls({startLevel: -1})
+  const hls = new Hls({startLevel: -1, maxBufferLength: 3, lowLatencyMode: false, maxBufferSize: 10 * 1000 * 1000})
 
-  // hls.startLevel = 2
+  
   
   useEffect(() =>{
     if (Hls.isSupported() && videoRef.current) {
@@ -102,6 +168,8 @@ export default function Home() {
   })
 
   return (
-    <VideoTag hls={hls} duration={VIDEODATA.duration} videoRef={videoRef} fragments={VIDEODATA.fragments}/>
+    <PlayerProvider videoRef={videoRef} hls={hls}>
+      <VideoTag hls={hls} duration={VIDEODATA.duration} videoRef={videoRef} fragments={VIDEODATA.fragments}/>
+    </PlayerProvider>
   );
 }
