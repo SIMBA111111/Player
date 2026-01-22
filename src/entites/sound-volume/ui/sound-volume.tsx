@@ -1,23 +1,29 @@
 "use client"
 
 import React, { RefObject, useEffect, useState } from 'react'
+
+import { getHHSStime } from '@/shared/utils/getHHSStime'
+
 import { 
+
     handleMouseClickSoundBtn, 
     handleMouseDownSoundBtn, 
     handleMouseUpSoundBtn, 
     handleMouseMoveSoundBtn, 
     handleMuteOnClick 
 } from '../lib/handlers'
-import { getHHSStime } from '@/shared/utils/getHHSStime'
+
 import styles from './styles.module.scss'
+
 
 interface ISoundVolume {
     videoRef: RefObject<HTMLVideoElement | null>
     isVisibleTools: boolean;
     duration: number;
+    fragmentTitle: string | undefined;
 }  
 
-export const SoundAndTimeVolume: React.FC<ISoundVolume> = ({videoRef, isVisibleTools, duration}) => {
+export const SoundAndTimeVolume: React.FC<ISoundVolume> = ({videoRef, isVisibleTools, duration, fragmentTitle}) => {
     const [isVisibleSoundBar, setIsVisibleSoundBar] = useState<boolean>(false)
     const [currentVolume, setCurrentVolume] = useState<number>(50)
     const [isDraggingVolume, setIsDraggingVolume] = useState<boolean>(false)
@@ -121,9 +127,11 @@ export const SoundAndTimeVolume: React.FC<ISoundVolume> = ({videoRef, isVisibleT
                 </div>
             </div>
             
-            <div className={styles.indicateTime}>
+            <div className={isVisibleSoundBar ? styles.indicateTime : styles.indicateTime_narrowed}>
                 {getHHSStime(Math.trunc(currentTime))} / {getHHSStime(Math.trunc(duration))} 
             </div>
+
+            <div className={styles.fragmentTitle}>{fragmentTitle}</div>
         </div>
     )
 }

@@ -1,13 +1,17 @@
 'use client'
 
 import { JSX, RefObject, useEffect, useMemo, useRef, useState } from "react";
+
+import { usePlayerContext } from "@/app/page";
 import { getHHSStime } from "@/shared/utils/getHHSStime"
 import { IFragment } from "@/widget/video-tag/model/video-tag.interface";
+
 import {
     handleMouseDown, handleMouseOverOnProgressBar, handleProgressClick 
 } from "../lib/handlers"
+
 import styles from './styles.module.scss'
-import { usePlayerContext } from "@/app/page";
+
 
 interface IProgressBar {
     duration: number;
@@ -16,6 +20,7 @@ interface IProgressBar {
     setProgress: (progress: number) => void;
     isVisibleTools: boolean;
     fragments: IFragment[]
+    // setCurrentFragment:
 }
 
 interface IBufferedFragment {
@@ -29,7 +34,7 @@ export const ProgressBar: React.FC<IProgressBar> = ({
     progress, 
     setProgress, 
     isVisibleTools, 
-    fragments
+    fragments,
 }) => {
     const [hoverTime, setHoverTime] = useState<number>(0);
     const [isDragging, setIsDragging] = useState(false);
@@ -171,7 +176,8 @@ export const ProgressBar: React.FC<IProgressBar> = ({
     dragTime, 
     videoRef, 
     bufferedFragments,
-    progress
+    progress,
+    context.hls
 ]);
 
     // ... остальной код без изменений
@@ -218,21 +224,59 @@ export const ProgressBar: React.FC<IProgressBar> = ({
             }
         };
 
-        const handleMouseUpWrapper = (e: MouseEvent) => {
-            if (!progressContainerRef.current || !videoRef.current || !duration) return;
-            
-            const rect = progressContainerRef.current.getBoundingClientRect();
-            const clickPosition = Math.min(Math.max(e.clientX - rect.left, 0), rect.width);
-            const clickPercentage = clickPosition / rect.width;
-            const newTime = clickPercentage * duration;
-            
-            videoRef.current.currentTime = newTime;
-            videoRef.current.paused ? context.setIsPaused(true) : context.setIsPaused(false);
-            
-            setHoverTime(0);
-            setDragTime(null);
-            setIsDragging(false);
-        };
+const handleMouseUpWrapper = (e: MouseEvent) => {
+    if (!progressContainerRef.current || !videoRef.current || !duration || !context.hls) return;
+    
+    const rect = progressContainerRef.current.getBoundingClientRect();
+    const clickPosition = Math.min(Math.max(e.clientX - rect.left, 0), rect.width);
+    const clickPercentage = clickPosition / rect.width;
+    const newTime = clickPercentage * duration;
+    
+    console.log(`Seeking to: ${newTime.toFixed(2)}s`);
+    
+    // 1. Останавливаем текущую загрузку
+    context.hls.stopLoad();
+    
+    // 2. Сбрасываем состояние буфера
+    setBufferedFragments([]);
+    
+    // 3. Устанавливаем новое время
+    videoRef.current.currentTime = newTime;
+    
+    // 4. Запускаем загрузку с новой позиции
+    context.hls.startLoad(newTime);
+    
+    // 5. Ждем немного и принудительно обновляем буфер
+    setTimeout(() => {
+        if (videoRef.current) {
+            const fragments: IBufferedFragment[] = [];
+            for (let index = 0; index < videoRef.current.buffered.length; index++) {
+                fragments.push({
+                    start: videoRef.current.buffered.start(index),
+                    end: videoRef.current.buffered.end(index)
+                });
+            }
+            setBufferedFragments(fragments);
+        }
+    }, 200);
+    
+    // 6. Обновляем состояние паузы
+    if (!context.isPaused) {
+        videoRef.current.play()
+            .then(() => context.setIsPaused(false))
+            .catch((error: any) => {
+                console.log('Autoplay prevented after seek');
+                context.setIsPaused(true);
+            });
+    } else {
+        context.setIsPaused(true);
+    }
+    
+    // 7. Сбрасываем состояние
+    setHoverTime(0);
+    setDragTime(null);
+    setIsDragging(false);
+};
 
         document.addEventListener('mousemove', handleMouseMoveWrapper, {passive: true});
         document.addEventListener('mouseup', handleMouseUpWrapper, {passive: true});

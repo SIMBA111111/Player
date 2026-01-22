@@ -1,5 +1,5 @@
 .soundAndTimeContainer {
-    width: 30%;
+    width: 65%;
     height: 35%;
     position: absolute;
     top: 35%;
@@ -18,7 +18,7 @@
 }
 
 .soundContainer {
-    width: 100%;
+    width: 40%;
     cursor: pointer;
     display: flex;
     gap: 15px;
@@ -95,7 +95,7 @@
     color: rgb(0, 0, 0);
     font-size: 20px;
     height: 60%;
-    width: 100%;
+    width: 30%;
     left: 21%;
     font-weight: 600;
     user-select: none;
@@ -103,4 +103,14 @@
     &_hidden {
         display: none;
     }
+
+    &_narrowed {
+        font-weight: 600;
+        font-size: 20px;
+        width: 20%;
+    }
+}
+
+.fragmentTitle {
+    width: 100%;
 }

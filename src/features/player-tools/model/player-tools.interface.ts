@@ -1,9 +1,10 @@
-import { IFragment } from "@/widget/video-tag/model/video-tag.interface";
-import { HlsEventEmitter } from "hls.js";
 import { RefObject } from "react";
+import Hls from "hls.js";
+
+import { IFragment } from "@/widget/video-tag/model/video-tag.interface";
 
 export interface IPlayerTools {
-    hls: any
+    hls: Hls
     duration: number
     videoRef: RefObject<HTMLVideoElement | null>
     isVisibleTools: boolean

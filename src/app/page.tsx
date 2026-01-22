@@ -63,57 +63,56 @@ const VIDEODATA = {
   // duration: 42.333,
   
   
-  // url: '/videos/test2/outTest2.m3u8',
-  // duration: 85.333,
-
-  // fragments : [
-  //   {
-  //     start: 0.000,
-  //     end: 40.000,
-  //     title: 'не начало'
-  //   },
-  //   {
-  //     start: 40.000,
-  //     end: 70.000,
-  //     title: 'экспозиция'
-  //   },
-  //   {
-  //     start: 70.000,
-  //     end: 75.000,
-  //     title: 'контент'
-  //   },
-  //   {
-  //     start: 75.000,
-  //     end: 85.333,
-  //     title: 'концовка'
-  //   },
-  // ]
-
-
-  url: '/videos/test4/master-playlist.m3u8',
-  duration: 9.585,
+  url: '/videos/test2/outTest2.m3u8',
+  duration: 85.333,
   fragments : [
     {
       start: 0.000,
-      end: 2.000,
+      end: 40.000,
       title: 'не начало'
     },
     {
-      start: 2.000,
-      end: 4.000,
+      start: 40.000,
+      end: 70.000,
       title: 'экспозиция'
     },
     {
-      start: 4.000,
-      end: 7.000,
+      start: 70.000,
+      end: 75.000,
       title: 'контент'
     },
     {
-      start: 7.000,
-      end: 9.585,
+      start: 75.000,
+      end: 85.333,
       title: 'концовка'
     },
   ]
+
+
+  // url: '/videos/test4/master-playlist.m3u8',
+  // duration: 9.585,
+  // fragments : [
+  //   {
+  //     start: 0.000,
+  //     end: 2.000,
+  //     title: 'не начало не начало не начало не начало не начало не начало не начало не начало не начало не начало не начало не начало не начало не начало'
+  //   },
+  //   {
+  //     start: 2.000,
+  //     end: 4.000,
+  //     title: 'экспозиция'
+  //   },
+  //   {
+  //     start: 4.000,
+  //     end: 7.000,
+  //     title: 'контент'
+  //   },
+  //   {
+  //     start: 7.000,
+  //     end: 9.585,
+  //     title: 'концовка'
+  //   },
+  // ]
 }
 
 export default function Home() {
