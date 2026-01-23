@@ -288,6 +288,9 @@ export const ProgressBar: React.FC<IProgressBar> = ({
         };
     }, [videoRef]);
 
+    // console.log('context.hls.media = ', context.hls.transferMedia() );
+    
+
     return (
         <>
             <div 

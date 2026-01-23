@@ -63,30 +63,56 @@ const VIDEODATA = {
   // duration: 42.333,
   
   
-  url: '/videos/test2/outTest2.m3u8',
-  duration: 85.333,
+  url: '/videos/long-video/longVideo.m3u8',
+  duration: 552.333,
   fragments : [
     {
       start: 0.000,
-      end: 40.000,
+      end: 100.000,
       title: 'не начало'
     },
     {
-      start: 40.000,
-      end: 70.000,
+      start: 100.000,
+      end: 200.000,
       title: 'экспозиция'
     },
     {
-      start: 70.000,
-      end: 75.000,
+      start: 200.000,
+      end: 300.000,
       title: 'контент'
     },
     {
-      start: 75.000,
-      end: 85.333,
+      start: 300.000,
+      end: 552.333,
       title: 'концовка'
     },
   ]
+
+
+  // url: '/videos/test2/outTest2.m3u8',
+  // duration: 85.333,
+  // fragments : [
+  //   {
+  //     start: 0.000,
+  //     end: 40.000,
+  //     title: 'не начало'
+  //   },
+  //   {
+  //     start: 40.000,
+  //     end: 70.000,
+  //     title: 'экспозиция'
+  //   },
+  //   {
+  //     start: 70.000,
+  //     end: 75.000,
+  //     title: 'контент'
+  //   },
+  //   {
+  //     start: 75.000,
+  //     end: 85.333,
+  //     title: 'концовка'
+  //   },
+  // ]
 
 
   // url: '/videos/test4/master-playlist.m3u8',
@@ -119,11 +145,8 @@ export default function Home() {
 
   const videoRef = useRef<HTMLVideoElement>(null)
   
-  const hls = new Hls({startLevel: -1, maxBufferLength: 5, lowLatencyMode: false, maxBufferSize: 100 * 1000 * 1000,
-        // enableStreaming: true,
-    // progressive: true,
-    maxBufferHole: 0.5,
-    // maxFragLookUpTolerance: 0.25,
+  const hls = new Hls({startLevel: -1, maxBufferLength: 30, lowLatencyMode: false, maxBufferSize: 100 * 1000 * 1000,
+    maxMaxBufferLength: 60,
   })
 
   
