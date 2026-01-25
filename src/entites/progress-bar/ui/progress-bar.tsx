@@ -25,17 +25,9 @@ interface IBufferedFragment {
     end: number;
 }
 
-interface IFragmentGradient {
-    id: string;
-    startPercent: number;
-    widthPercent: number;
-    gradient: string; // CSS gradient строка
-}
-
 export const ProgressBar: React.FC<IProgressBar> = ({
     duration, 
     videoRef, 
-    progress, 
     setProgress, 
     isVisibleTools, 
     fragments,
@@ -43,228 +35,184 @@ export const ProgressBar: React.FC<IProgressBar> = ({
     const [hoverTime, setHoverTime] = useState<number>(0);
     const [isDragging, setIsDragging] = useState(false);
     const [bufferedFragments, setBufferedFragments] = useState<IBufferedFragment[]>([]);
-    const [dragTime, setDragTime] = useState<number | null>(null);
+    const [currentVideoTime, setCurrentVideoTime] = useState(0); // Локальное состояние для времени
     const progressContainerRef = useRef<HTMLDivElement>(null);
+    const animationFrameRef = useRef<number>(0); // Ref для requestAnimationFrame
     const context = usePlayerContext();
 
-    // Создаем градиенты для каждого фрагмента
-// Альтернативный, более простой подход
-const fragmentGradients = useMemo((): IFragmentGradient[] => {
-    const currentTime = isDragging && dragTime !== null 
-        ? dragTime 
-        : videoRef.current?.currentTime || 0;
-    
-    const GAP_PERCENT = 0.1;
-    
-    return fragments.map((fragment, index) => {
-        const fragmentDuration = fragment.end - fragment.start;
-        
-        // Вычисляем позиции в процентах
-        let startPercent = 0;
-        for (let i = 0; i < index; i++) {
-            const prevFragment = fragments[i];
-            const prevDuration = prevFragment.end - prevFragment.start;
-            startPercent += (prevDuration / duration) * 100 + GAP_PERCENT;
-        }
-        
-        const widthPercent = (fragmentDuration / duration) * 100;
-        
-        // Вычисляем прогресс внутри фрагмента (0-100%)
-        let progressPercent = 0;
-        if (currentTime >= fragment.end) {
-            progressPercent = 100;
-        } else if (currentTime > fragment.start) {
-            progressPercent = ((currentTime - fragment.start) / fragmentDuration) * 100;
-        }
-        
-        // Собираем буферизированные части
-        const bufferStops: Array<{start: number, end: number}> = [];
-        bufferedFragments.forEach(buffered => {
-            const overlapStart = Math.max(fragment.start, buffered.start);
-            const overlapEnd = Math.min(fragment.end, buffered.end);
-            
-            if (overlapStart < overlapEnd) {
-                const bufferStartPercent = ((overlapStart - fragment.start) / fragmentDuration) * 100;
-                const bufferEndPercent = ((overlapEnd - fragment.start) / fragmentDuration) * 100;
-                
-                // Только буфер после текущего времени
-                if (bufferEndPercent > progressPercent) {
-                    bufferStops.push({
-                        start: Math.max(bufferStartPercent, progressPercent),
-                        end: bufferEndPercent
-                    });
-                }
-            }
-        });
-        
-        // Создаем массив цветовых переходов
-        // Для корректного отображения нужно строить градиент с учетом всех точек
-        const colorStops: Array<{pos: number, color: string}> = [];
-        
-        // Добавляем ключевые точки
-        colorStops.push({pos: 0, color: '#1e90ff'}); // начало прогресса
-        
-        if (progressPercent > 0) {
-            colorStops.push({pos: progressPercent, color: '#1e90ff'}); // конец прогресса
-        }
-        
-        // После прогресса - буфер или фон
-        bufferStops.forEach(buffer => {
-            if (buffer.start >= progressPercent) {
-                colorStops.push({pos: buffer.start, color: '#666'}); // начало буфера
-                colorStops.push({pos: buffer.end, color: '#666'}); // конец буфера
-            }
-        });
-        
-        // Сортируем по позиции
-        colorStops.sort((a, b) => a.pos - b.pos);
-        
-        // Добавляем фон там, где нет прогресса и буфера
-        const finalStops: string[] = [];
-        let lastPos = 0;
-        
-        colorStops.forEach((stop, i) => {
-            // Добавляем фон между стопами
-            if (stop.pos > lastPos) {
-                finalStops.push(`#444 ${lastPos}%`);
-                finalStops.push(`#444 ${stop.pos}%`);
-            }
-            
-            // Добавляем цвет стопа
-            finalStops.push(`${stop.color} ${stop.pos}%`);
-            
-            // Если следующий стоп другого цвета, добавляем переход
-            if (i < colorStops.length - 1 && colorStops[i + 1].pos > stop.pos) {
-                finalStops.push(`${stop.color} ${stop.pos}%`);
-                finalStops.push(`${stop.color} ${colorStops[i + 1].pos}%`);
-            }
-            
-            lastPos = stop.pos;
-        });
-        
-        // Добавляем фон до конца
-        if (lastPos < 100) {
-            finalStops.push(`#444 ${lastPos}%`);
-            finalStops.push(`#444 100%`);
-        }
-        
-        // Удаляем дубликаты
-        const uniqueStops = finalStops.filter((stop, index, array) => 
-            array.indexOf(stop) === index
-        );
-        
-        const gradient = `linear-gradient(to right, ${uniqueStops.join(', ')})`;
-        
-        return {
-            id: `fragment-${index}`,
-            startPercent,
-            widthPercent,
-            gradient
-        };
-    });
-}, [
-    fragments, 
-    duration, 
-    isDragging, 
-    dragTime, 
-    videoRef, 
-    bufferedFragments,
-    progress
-]);
+    // Оптимизированный таймер для обновления времени
+    useEffect(() => {
+        const video = videoRef.current;
+        if (!video || isDragging) return;
 
-    // Создаем список div'ов фрагментов
+        const updateTime = () => {
+            setCurrentVideoTime(video.currentTime);
+            setProgress((video.currentTime / duration) * 100);
+            animationFrameRef.current = requestAnimationFrame(updateTime);
+        };
+
+        // Запускаем обновление через requestAnimationFrame для плавности
+        animationFrameRef.current = requestAnimationFrame(updateTime);
+        
+        return () => {
+            if (animationFrameRef.current) {
+                cancelAnimationFrame(animationFrameRef.current);
+            }
+        };
+    }, [videoRef, duration, isDragging]);
+
+    // Создаем фрагменты через useMemo с зависимостью от currentVideoTime
     const fragmentElements = useMemo(() => {
+        if (!duration || fragments.length === 0) return [];
+        
         const elements: JSX.Element[] = [];
         
-        fragmentGradients.forEach((fragment) => {
+        fragments.forEach((fragment, index) => {
+            const fragmentStartPercent = (fragment.start / duration) * 100;
+            const fragmentEndPercent = (fragment.end / duration) * 100;
+            const fragmentWidthPercent = fragmentEndPercent - fragmentStartPercent;
+            
+            // Вычисляем прогресс внутри фрагмента (0-100%)
+            let progressPercent = 0;
+            if (currentVideoTime >= fragment.end) {
+                progressPercent = 100;
+            } else if (currentVideoTime > fragment.start) {
+                progressPercent = ((currentVideoTime - fragment.start) / (fragment.end - fragment.start)) * 100;
+            }
+            
+            // Собираем буферизированные части
+            const bufferStops: Array<{start: number, end: number}> = [];
+            bufferedFragments.forEach(buffered => {
+                const overlapStart = Math.max(fragment.start, buffered.start);
+                const overlapEnd = Math.min(fragment.end, buffered.end);
+                
+                if (overlapStart < overlapEnd) {
+                    const bufferStartPercent = ((overlapStart - fragment.start) / (fragment.end - fragment.start)) * 100;
+                    const bufferEndPercent = ((overlapEnd - fragment.start) / (fragment.end - fragment.start)) * 100;
+                    
+                    // Только буфер после текущего времени
+                    if (bufferEndPercent > progressPercent) {
+                        bufferStops.push({
+                            start: Math.max(bufferStartPercent, progressPercent),
+                            end: bufferEndPercent
+                        });
+                    }
+                }
+            });
+            
+            // Создаем градиент (упрощенная версия для производительности)
+            const gradientStops: string[] = [];
+            
+            // Если есть прогресс
+            if (progressPercent > 0) {
+                gradientStops.push('#1e90ff 0%');
+                gradientStops.push(`#1e90ff ${progressPercent}%`);
+                gradientStops.push(`#444 ${progressPercent}%`);
+            } else {
+                gradientStops.push('#444 0%');
+            }
+            
+            // Буферные зоны
+            bufferStops.forEach(buffer => {
+                gradientStops.push(`#666 ${buffer.start}%`);
+                gradientStops.push(`#666 ${buffer.end}%`);
+            });
+            
+            // Добавляем фон в конце
+            const lastValue = gradientStops.length > 0 
+                ? parseFloat(gradientStops[gradientStops.length - 1].split(' ')[1].replace('%', ''))
+                : 0;
+                
+            if (lastValue < 100) {
+                gradientStops.push(`#444 ${Math.max(lastValue, progressPercent)}%`);
+                gradientStops.push(`#444 100%`);
+            }
+            
+            const gradient = `linear-gradient(to right, ${gradientStops.join(', ')})`;
+            
             elements.push(
                 <div 
-                    key={fragment.id}
+                    key={index}
                     className={styles.fragment}
                     style={{
-                        left: `${fragment.startPercent}%`,
-                        width: `${fragment.widthPercent}%`,
-                        background: fragment.gradient,
-                        position: 'absolute',
-                        height: '100%',
-                        borderRadius: '2px'
+                        left: `${fragmentStartPercent}%`,
+                        width: `${fragmentWidthPercent}%`,
+                        background: gradient,
                     }}
                 />
             );
         });
         
         return elements;
-    }, [fragmentGradients]);
+    }, [fragments, duration, bufferedFragments, currentVideoTime]); // Зависим от currentVideoTime вместо progress
 
-    useEffect(() => {
-        const video = videoRef.current;
-        if (!video) return;
-
-        const updateProgress = () => {
-            if (duration > 0 && !isDragging) {
-                const currentProgress = (video.currentTime / duration) * 100;
-                setProgress(currentProgress);
-                setDragTime(null);
-            }
-        };
-
-        video.addEventListener('timeupdate', updateProgress);
-        
-        return () => {
-            video.removeEventListener('timeupdate', updateProgress);
-        };
-    }, [videoRef, duration, isDragging]);
-
+    // Оптимизированный хендлер для перетаскивания
     useEffect(() => {
         if (!isDragging) return;
 
+        let isUpdating = false;
+        
         const handleMouseMoveWrapper = (e: MouseEvent) => {
-            if (!progressContainerRef.current || !duration) return;
+            if (!progressContainerRef.current || !duration || isUpdating) return;
             
-            const rect = progressContainerRef.current.getBoundingClientRect();
-            const clickPosition = Math.min(Math.max(e.clientX - rect.left, 0), rect.width);
-            const clickPercentage = clickPosition / rect.width;
-            const newTime = clickPercentage * duration;
+            isUpdating = true;
             
-            videoRef.current.currentTime = newTime;
-            context.setIsPaused(true);
-            
-            setDragTime(newTime);
-            setProgress(clickPercentage * 100);
-            setHoverTime(newTime);
-            
-            const timeHoverPosition = document.getElementById('timeHover');
-            if (timeHoverPosition) {
-                timeHoverPosition.style.left = `${clickPosition}px`;
-            }
+            // Используем requestAnimationFrame для плавного обновления
+            requestAnimationFrame(() => {
+                const rect = progressContainerRef.current!.getBoundingClientRect();
+                const clickPosition = Math.min(Math.max(e.clientX - rect.left, 0), rect.width);
+                const clickPercentage = (clickPosition / rect.width);
+                const newTime = clickPercentage * duration;
+                
+                // Обновляем локальное состояние
+                setCurrentVideoTime(newTime);
+                videoRef.current!.currentTime = newTime;
+                
+                setHoverTime(newTime);
+                
+                const timeHoverPosition = document.getElementById('timeHover');
+                if (timeHoverPosition) {
+                    timeHoverPosition.style.left = `${clickPosition}px`;
+                }
+                
+                isUpdating = false;
+            });
         };
 
         const handleMouseUpWrapper = (e: MouseEvent) => {
-            if (!progressContainerRef.current || !videoRef.current || !duration || !context.hls) return;
+            if (!progressContainerRef.current || !videoRef.current || !duration) return;
             
             const rect = progressContainerRef.current.getBoundingClientRect();
             const clickPosition = Math.min(Math.max(e.clientX - rect.left, 0), rect.width);
-            const clickPercentage = clickPosition / rect.width;
+            const clickPercentage = (clickPosition / rect.width);
             const newTime = clickPercentage * duration;
             
-            console.log(`Seeking to: ${newTime.toFixed(2)}s`);
-            
+            // Финальное обновление
             videoRef.current.currentTime = newTime;
+            setCurrentVideoTime(newTime);
+            setProgress(clickPercentage * 100);
             
             setHoverTime(0);
-            setDragTime(null);
             setIsDragging(false);
+            
+            // Восстанавливаем таймер обновления
+            context.setIsPaused(false);
         };
 
+        // Ставим видео на паузу при начале перетаскивания
+        context.setIsPaused(true);
+        
         document.addEventListener('mousemove', handleMouseMoveWrapper, {passive: true});
         document.addEventListener('mouseup', handleMouseUpWrapper, {passive: true});
 
         return () => {
             document.removeEventListener('mousemove', handleMouseMoveWrapper);
             document.removeEventListener('mouseup', handleMouseUpWrapper);
+            context.setIsPaused(false);
         };
     }, [isDragging, duration, videoRef, context]);
 
+    // Обновляем буфер
     useEffect(() => {
         if (!videoRef?.current) return;
         
@@ -292,13 +240,35 @@ const fragmentGradients = useMemo((): IFragmentGradient[] => {
         };
     }, [videoRef]);
 
+    // Упрощенные хендлеры для мыши
+    const handleMouseOver = (e: React.MouseEvent) => {
+        if (!isDragging && progressContainerRef.current && duration) {
+            const rect = progressContainerRef.current.getBoundingClientRect();
+            const clickPosition = Math.min(Math.max(e.clientX - rect.left, 0), rect.width);
+            const newTime = (clickPosition / rect.width) * duration;
+            setHoverTime(newTime);
+        }
+    };
+
+    const handleClick = (e: React.MouseEvent) => {
+        if (!isDragging && progressContainerRef.current && duration) {
+            const rect = progressContainerRef.current.getBoundingClientRect();
+            const clickPosition = Math.min(Math.max(e.clientX - rect.left, 0), rect.width);
+            const newTime = (clickPosition / rect.width) * duration;
+            
+            videoRef.current!.currentTime = newTime;
+            setCurrentVideoTime(newTime);
+            setProgress((newTime / duration) * 100);
+        }
+    };
+
     return (
         <>
             <div 
                 id='timeHover' 
                 className={hoverTime ? styles.progressTimeHover : styles.progressTimeHover_hidden}
                 style={{ 
-                    left: hoverTime ? `${(hoverTime / duration) * 100}%` : '0',
+                    left: `${(hoverTime / duration) * 100}%`,
                     display: hoverTime ? 'block' : 'none'
                 }}
             >
@@ -308,11 +278,7 @@ const fragmentGradients = useMemo((): IFragmentGradient[] => {
                 id="progressBar"
                 ref={progressContainerRef}
                 className={styles.progressContainer}
-                onClick={(e: any) => { 
-                    if (!isDragging) {
-                        handleProgressClick(e, duration, setProgress, videoRef, progressContainerRef);
-                    }
-                }}
+                onClick={handleClick}
                 onMouseDown={(e: any) => { 
                     handleMouseDown(e, setIsDragging);
                 }}
@@ -321,17 +287,12 @@ const fragmentGradients = useMemo((): IFragmentGradient[] => {
                         setHoverTime(0);
                     }
                 }}
-                onMouseMove={(e: any) => {
-                    if (!isDragging) {
-                        handleMouseOverOnProgressBar(e, videoRef, duration, progressContainerRef, setHoverTime);
-                    }
-                }}
+                onMouseMove={handleMouseOver}
             >
-                {/* Фон для промежутков */}
-                <div className={styles.background} />
-                
-                {/* Фрагменты прогресса - КАЖДЫЙ ОДИН DIV С ГРАДИЕНТОМ */}
-                {fragmentElements}
+                {/* Фрагменты прогресса */}
+                <div className={styles.xxx}>
+                    {fragmentElements}
+                </div>
             </div>
         </>
     );

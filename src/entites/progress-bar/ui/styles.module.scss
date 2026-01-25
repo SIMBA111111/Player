@@ -18,14 +18,19 @@
 }
 
 .fragment {
-    position: absolute;
+    // position: absolute;
     height: 100%;
     top: 0;
     z-index: 1;
-    pointer-events: none;
-    border-radius: 200px;
+    // pointer-events: none;
+    // border-radius: 200px;
     background-repeat: no-repeat;
     background-size: 100% 100%;
+
+    &:hover {
+        top: 5px;
+        height: 20px;
+    }
 }
 
 .progressTimeHover {
@@ -43,4 +48,15 @@
 
 .progressTimeHover_hidden {
     display: none;
+}
+
+.xxx {
+    top: 0;
+    left: 0;
+    height: 10px;
+    width: 100%;
+    position: absolute;
+    display: flex;
+    flex-direction: row;
+    gap: 2px;
 }
