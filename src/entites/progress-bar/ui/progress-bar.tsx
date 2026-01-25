@@ -1,17 +1,15 @@
 'use client'
 
 import { JSX, RefObject, useEffect, useMemo, useRef, useState } from "react";
-
 import { usePlayerContext } from "@/app/page";
-import { getHHSStime } from "@/shared/utils/getHHSStime"
+import { getHHSStime } from "@/shared/utils/getHHSStime";
 import { IFragment } from "@/widget/video-tag/model/video-tag.interface";
-
 import {
-    handleMouseDown, handleMouseOverOnProgressBar, handleProgressClick 
-} from "../lib/handlers"
-
-import styles from './styles.module.scss'
-
+    handleMouseDown, 
+    handleMouseOverOnProgressBar, 
+    handleProgressClick 
+} from "../lib/handlers";
+import styles from './styles.module.scss';
 
 interface IProgressBar {
     duration: number;
@@ -19,13 +17,19 @@ interface IProgressBar {
     progress: number;
     setProgress: (progress: number) => void;
     isVisibleTools: boolean;
-    fragments: IFragment[]
-    // setCurrentFragment:
+    fragments: IFragment[];
 }
 
 interface IBufferedFragment {
     start: number;
     end: number;
+}
+
+interface IFragmentGradient {
+    id: string;
+    startPercent: number;
+    widthPercent: number;
+    gradient: string; // CSS gradient строка
 }
 
 export const ProgressBar: React.FC<IProgressBar> = ({
@@ -43,132 +47,121 @@ export const ProgressBar: React.FC<IProgressBar> = ({
     const progressContainerRef = useRef<HTMLDivElement>(null);
     const context = usePlayerContext();
 
-    // Единая функция для вычисления всех сегментов
-    const progressSegments = useMemo(() => {
+    // Создаем градиенты для каждого фрагмента
+// Альтернативный, более простой подход
+const fragmentGradients = useMemo((): IFragmentGradient[] => {
     const currentTime = isDragging && dragTime !== null 
         ? dragTime 
         : videoRef.current?.currentTime || 0;
     
-    const GAP_PERCENT = 0.3;
-    const segments: JSX.Element[] = [];
+    const GAP_PERCENT = 0.1;
     
-    // Предварительно вычисляем позиции всех фрагментов
-    const fragmentPositions = fragments.map((fragment, index) => {
-        const fragmentTime = fragment.end - fragment.start;
-        const widthPercent = (fragmentTime / duration) * 100;
+    return fragments.map((fragment, index) => {
+        const fragmentDuration = fragment.end - fragment.start;
         
-        // Вычисляем left позицию с учетом gap
-        let leftPercent = 0;
+        // Вычисляем позиции в процентах
+        let startPercent = 0;
         for (let i = 0; i < index; i++) {
-            const prevFragmentTime = fragments[i].end - fragments[i].start;
-            leftPercent += (prevFragmentTime / duration) * 100 + GAP_PERCENT;
+            const prevFragment = fragments[i];
+            const prevDuration = prevFragment.end - prevFragment.start;
+            startPercent += (prevDuration / duration) * 100 + GAP_PERCENT;
         }
         
-        return {
-            ...fragment,
-            index,
-            widthPercent,
-            leftPercent,
-            time: fragmentTime
-        };
-    });
-
-    // 1. Сначала добавляем все фоновые сегменты
-    fragmentPositions.forEach(fragment => {
-        segments.push(
-            <div 
-                key={`bg-${fragment.index}`} 
-                className={`${styles.progressBackground} ${styles.progressFragment}`} 
-                style={{
-                    width: `${fragment.widthPercent}%`,
-                    left: `${fragment.leftPercent}%`,
-                    zIndex: 1
-                }}
-            />
-        );
-    });
-
-    // 2. Обрабатываем каждый фрагмент: буфер + заполненная часть
-    fragmentPositions.forEach(fragment => {
-        const currentFragmentBuffers: {left: number, width: number}[] = [];
+        const widthPercent = (fragmentDuration / duration) * 100;
         
-        // Собираем буферизированные участки для этого фрагмента
+        // Вычисляем прогресс внутри фрагмента (0-100%)
+        let progressPercent = 0;
+        if (currentTime >= fragment.end) {
+            progressPercent = 100;
+        } else if (currentTime > fragment.start) {
+            progressPercent = ((currentTime - fragment.start) / fragmentDuration) * 100;
+        }
+        
+        // Собираем буферизированные части
+        const bufferStops: Array<{start: number, end: number}> = [];
         bufferedFragments.forEach(buffered => {
-            if (currentTime > fragment.end) return;
-            
             const overlapStart = Math.max(fragment.start, buffered.start);
             const overlapEnd = Math.min(fragment.end, buffered.end);
             
             if (overlapStart < overlapEnd) {
-                let widthPercent: number;
-                let leftPercent: number;
+                const bufferStartPercent = ((overlapStart - fragment.start) / fragmentDuration) * 100;
+                const bufferEndPercent = ((overlapEnd - fragment.start) / fragmentDuration) * 100;
                 
-                if (currentTime >= fragment.start && currentTime < fragment.end && overlapStart < currentTime) {
-                    // Только часть после currentTime
-                    const visualStart = Math.max(overlapStart, currentTime);
-                    widthPercent = ((overlapEnd - visualStart) / fragment.time) * fragment.widthPercent;
-                    leftPercent = fragment.leftPercent + ((visualStart - fragment.start) / fragment.time) * fragment.widthPercent;
-                } else {
-                    // Весь пересекающийся участок
-                    widthPercent = ((overlapEnd - overlapStart) / fragment.time) * fragment.widthPercent;
-                    leftPercent = fragment.leftPercent + ((overlapStart - fragment.start) / fragment.time) * fragment.widthPercent;
-                }
-                
-                if (widthPercent > 0) {
-                    currentFragmentBuffers.push({
-                        left: leftPercent,
-                        width: widthPercent
+                // Только буфер после текущего времени
+                if (bufferEndPercent > progressPercent) {
+                    bufferStops.push({
+                        start: Math.max(bufferStartPercent, progressPercent),
+                        end: bufferEndPercent
                     });
                 }
             }
         });
-
-        // Добавляем буферизированные части для этого фрагмента
-        currentFragmentBuffers.forEach((buffer, bufferIndex) => {
-            segments.push(
-                <div 
-                    key={`buffer-${fragment.index}-${bufferIndex}`}
-                    className={`${styles.progressBuffered} ${styles.progressFragment}`}
-                    style={{ 
-                        width: `${buffer.width}%`,
-                        left: `${buffer.left}%`,
-                        zIndex: 2
-                    }}
-                />
-            );
-        });
-
-        // 3. Добавляем заполненную часть для этого фрагмента
-        if (currentTime >= fragment.start) {
-            let filledWidthPercent = 0;
-            
-            if (currentTime <= fragment.end) {
-                // Текущий фрагмент - заполняем частично
-                const timeInFragment = currentTime - fragment.start;
-                filledWidthPercent = (timeInFragment / fragment.time) * fragment.widthPercent;
-            } else {
-                // Фрагмент полностью пройден
-                filledWidthPercent = fragment.widthPercent;
-            }
-            
-            // Создаем один элемент для заполненной части
-            if (filledWidthPercent > 0) {
-                segments.push(
-                    <div 
-                        key={`filled-${fragment.index}`}
-                        className={`${styles.progressFilled} ${styles.progressFragment}`}
-                        style={{ 
-                            width: `${filledWidthPercent}%`,
-                            left: `${fragment.leftPercent}%`,
-                            zIndex: 3
-                        }}
-                    />
-                );
-            }
+        
+        // Создаем массив цветовых переходов
+        // Для корректного отображения нужно строить градиент с учетом всех точек
+        const colorStops: Array<{pos: number, color: string}> = [];
+        
+        // Добавляем ключевые точки
+        colorStops.push({pos: 0, color: '#1e90ff'}); // начало прогресса
+        
+        if (progressPercent > 0) {
+            colorStops.push({pos: progressPercent, color: '#1e90ff'}); // конец прогресса
         }
+        
+        // После прогресса - буфер или фон
+        bufferStops.forEach(buffer => {
+            if (buffer.start >= progressPercent) {
+                colorStops.push({pos: buffer.start, color: '#666'}); // начало буфера
+                colorStops.push({pos: buffer.end, color: '#666'}); // конец буфера
+            }
+        });
+        
+        // Сортируем по позиции
+        colorStops.sort((a, b) => a.pos - b.pos);
+        
+        // Добавляем фон там, где нет прогресса и буфера
+        const finalStops: string[] = [];
+        let lastPos = 0;
+        
+        colorStops.forEach((stop, i) => {
+            // Добавляем фон между стопами
+            if (stop.pos > lastPos) {
+                finalStops.push(`#444 ${lastPos}%`);
+                finalStops.push(`#444 ${stop.pos}%`);
+            }
+            
+            // Добавляем цвет стопа
+            finalStops.push(`${stop.color} ${stop.pos}%`);
+            
+            // Если следующий стоп другого цвета, добавляем переход
+            if (i < colorStops.length - 1 && colorStops[i + 1].pos > stop.pos) {
+                finalStops.push(`${stop.color} ${stop.pos}%`);
+                finalStops.push(`${stop.color} ${colorStops[i + 1].pos}%`);
+            }
+            
+            lastPos = stop.pos;
+        });
+        
+        // Добавляем фон до конца
+        if (lastPos < 100) {
+            finalStops.push(`#444 ${lastPos}%`);
+            finalStops.push(`#444 100%`);
+        }
+        
+        // Удаляем дубликаты
+        const uniqueStops = finalStops.filter((stop, index, array) => 
+            array.indexOf(stop) === index
+        );
+        
+        const gradient = `linear-gradient(to right, ${uniqueStops.join(', ')})`;
+        
+        return {
+            id: `fragment-${index}`,
+            startPercent,
+            widthPercent,
+            gradient
+        };
     });
-
-    return segments;
 }, [
     fragments, 
     duration, 
@@ -176,11 +169,33 @@ export const ProgressBar: React.FC<IProgressBar> = ({
     dragTime, 
     videoRef, 
     bufferedFragments,
-    progress,
-    context.hls
+    progress
 ]);
 
-    // ... остальной код без изменений
+    // Создаем список div'ов фрагментов
+    const fragmentElements = useMemo(() => {
+        const elements: JSX.Element[] = [];
+        
+        fragmentGradients.forEach((fragment) => {
+            elements.push(
+                <div 
+                    key={fragment.id}
+                    className={styles.fragment}
+                    style={{
+                        left: `${fragment.startPercent}%`,
+                        width: `${fragment.widthPercent}%`,
+                        background: fragment.gradient,
+                        position: 'absolute',
+                        height: '100%',
+                        borderRadius: '2px'
+                    }}
+                />
+            );
+        });
+        
+        return elements;
+    }, [fragmentGradients]);
+
     useEffect(() => {
         const video = videoRef.current;
         if (!video) return;
@@ -234,19 +249,8 @@ export const ProgressBar: React.FC<IProgressBar> = ({
             
             console.log(`Seeking to: ${newTime.toFixed(2)}s`);
             
-            // 1. Останавливаем текущую загрузку
-            // context.hls.stopLoad();
-            
-            // 2. Устанавливаем новое время
             videoRef.current.currentTime = newTime;
             
-            // 3. Начинаем загрузку с новой позиции
-            // context.hls.startLoad(newTime);
-            
-            // 4. Сбрасываем состояние буфера в компоненте
-            // setBufferedFragments([]);
-            
-            // 6. Сбрасываем состояние
             setHoverTime(0);
             setDragTime(null);
             setIsDragging(false);
@@ -288,9 +292,6 @@ export const ProgressBar: React.FC<IProgressBar> = ({
         };
     }, [videoRef]);
 
-    // console.log('context.hls.media = ', context.hls.transferMedia() );
-    
-
     return (
         <>
             <div 
@@ -326,7 +327,11 @@ export const ProgressBar: React.FC<IProgressBar> = ({
                     }
                 }}
             >
-                {progressSegments}
+                {/* Фон для промежутков */}
+                <div className={styles.background} />
+                
+                {/* Фрагменты прогресса - КАЖДЫЙ ОДИН DIV С ГРАДИЕНТОМ */}
+                {fragmentElements}
             </div>
         </>
     );
