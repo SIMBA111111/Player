@@ -13,10 +13,9 @@ interface IPlayButtons {
     videoRef: RefObject<HTMLVideoElement | null>
     duration: number;
     isVisibleTools: boolean
-    setProgress: (progress: number) => void;
 }   
 
-export const PlayButtons: React.FC<IPlayButtons> = ({videoRef, duration, isVisibleTools, setProgress}) => {
+export const PlayButtons: React.FC<IPlayButtons> = ({videoRef, duration, isVisibleTools}) => {
     const context = usePlayerContext();
 
     if (!videoRef || !videoRef.current) {
@@ -33,7 +32,7 @@ export const PlayButtons: React.FC<IPlayButtons> = ({videoRef, duration, isVisib
                 // className={isVisibleTools ? styles.rewindBtn : styles.rewindBtn_hidden} 
                 className={styles.rewindBtn} 
                 onClick={(e: any) => {
-                    handleRewind(videoRef, setProgress, duration, context)
+                    handleRewind(videoRef, duration, context)
                 }}
             >
                 <img src="/images/png/forward10_Bold.png" alt="" height={30}/>
@@ -61,7 +60,7 @@ export const PlayButtons: React.FC<IPlayButtons> = ({videoRef, duration, isVisib
                 // className={isVisibleTools ? styles.forwardBtn : styles.forwardBtn_hidden} 
                 className={styles.forwardBtn} 
                 onClick={(e: any) => {
-                    handleForward(videoRef, setProgress, duration, context)
+                    handleForward(videoRef, duration, context)
                 }}
             >
                 <img src="/images/png/rewind10_Bold.png" alt="" height={30}/>

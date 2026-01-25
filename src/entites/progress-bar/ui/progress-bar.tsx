@@ -14,8 +14,6 @@ import styles from './styles.module.scss';
 interface IProgressBar {
     duration: number;
     videoRef: RefObject<any>;
-    progress: number;
-    setProgress: (progress: number) => void;
     isVisibleTools: boolean;
     fragments: IFragment[];
 }
@@ -28,7 +26,6 @@ interface IBufferedFragment {
 export const ProgressBar: React.FC<IProgressBar> = ({
     duration, 
     videoRef, 
-    setProgress, 
     isVisibleTools, 
     fragments,
 }) => {
@@ -47,7 +44,6 @@ export const ProgressBar: React.FC<IProgressBar> = ({
 
         const updateTime = () => {
             setCurrentVideoTime(video.currentTime);
-            setProgress((video.currentTime / duration) * 100);
             animationFrameRef.current = requestAnimationFrame(updateTime);
         };
 
@@ -190,7 +186,6 @@ export const ProgressBar: React.FC<IProgressBar> = ({
             // Финальное обновление
             videoRef.current.currentTime = newTime;
             setCurrentVideoTime(newTime);
-            setProgress(clickPercentage * 100);
             
             setHoverTime(0);
             setIsDragging(false);
@@ -258,7 +253,6 @@ export const ProgressBar: React.FC<IProgressBar> = ({
             
             videoRef.current!.currentTime = newTime;
             setCurrentVideoTime(newTime);
-            setProgress((newTime / duration) * 100);
         }
     };
 
