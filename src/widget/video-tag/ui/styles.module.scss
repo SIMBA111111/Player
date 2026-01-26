@@ -1,12 +1,10 @@
 .playerContainer {
     position: relative;
     width: 1400px;
-    // cursor: pointer;
-    z-index: 1;
 
     &_hidden {
+        transition: all 1s ease;
         position: relative;
-        z-index: 1;
         width: 1400px;
         cursor: none;
     }

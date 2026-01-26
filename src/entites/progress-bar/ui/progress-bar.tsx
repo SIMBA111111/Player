@@ -14,7 +14,6 @@ import styles from './styles.module.scss';
 interface IProgressBar {
     duration: number;
     videoRef: RefObject<any>;
-    isVisibleTools: boolean;
     fragments: IFragment[];
 }
 
@@ -26,7 +25,6 @@ interface IBufferedFragment {
 export const ProgressBar: React.FC<IProgressBar> = ({
     duration, 
     videoRef, 
-    isVisibleTools, 
     fragments,
 }) => {
     const [hoverTime, setHoverTime] = useState<number>(0);
@@ -284,7 +282,7 @@ export const ProgressBar: React.FC<IProgressBar> = ({
                 onMouseMove={handleMouseOver}
             >
                 {/* Фрагменты прогресса */}
-                <div className={styles.xxx}>
+                <div className={styles.fragmentsContainer}>
                     {fragmentElements}
                 </div>
             </div>

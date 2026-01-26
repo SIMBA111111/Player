@@ -13,7 +13,7 @@ export const VideoTagHandlers = (
         }
         hideToolsTimer.current = setTimeout(() => {
             setIsVisibleTools(false);
-        }, 2000);
+        }, 3000);
     };
 
     const handleMouseLeave = () => {
@@ -23,13 +23,8 @@ export const VideoTagHandlers = (
         setIsVisibleTools(false);
     };
 
-    const handleMouseOver = () => {
-        setIsVisibleTools(true);
-    };
-
     return {
         handleMouseMove,
         handleMouseLeave,
-        handleMouseOver,
     };
 };

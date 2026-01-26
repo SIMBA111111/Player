@@ -273,8 +273,6 @@ export default function Home() {
   const hls = new Hls({startLevel: -1, maxBufferLength: 1, lowLatencyMode: false, maxBufferSize: 10 * 1000 * 1000,
     maxMaxBufferLength: 60,
   })
-
-  
   
   useEffect(() =>{
     if (Hls.isSupported() && videoRef.current) {
@@ -332,11 +330,6 @@ export default function Home() {
   return (
     <PlayerProvider videoRef={videoRef} hls={hls}>
       <VideoTag hls={hls} duration={VIDEODATA.duration} videoRef={videoRef} fragments={VIDEODATA.fragments}/>
-      <div style={{
-        width: '100%',
-        height: '20px',
-        backgroundImage: 'linear-gradient(to right, red 33.3%, blue 33.3%, blue 66.6%, green 66.6%)'
-      }}></div>
     </PlayerProvider>
   );
 }

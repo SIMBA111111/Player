@@ -9,8 +9,8 @@ export const handleMuteOnClick = (
 
     if (videoRef.current.muted || videoRef.current.volume === 0) {
         videoRef.current.muted = false
-        videoRef.current.volume = 1
-        setCurrentVolume(100)
+        videoRef.current.volume = 0.5
+        setCurrentVolume(50)
     } else {
         videoRef.current.muted = true
         setCurrentVolume(0)
@@ -30,7 +30,8 @@ export const handleMouseClickSoundBtn = (
     const positionOfSoundBar = soundVolumeBackgroundBar.getBoundingClientRect()
     const positionOfNewVolume = (e.clientX - positionOfSoundBar.left) / positionOfSoundBar.width
     const newVolume = Math.max(0, Math.min(1, positionOfNewVolume))
-
+    console.log(newVolume);
+    
     videoRef.current.volume = newVolume
     setCurrentVolume(newVolume * 100)
 }
@@ -50,21 +51,21 @@ export const handleMouseUpSoundBtn = (
 }
 
 // Перемещение при перетаскивании
-export const handleMouseMoveSoundBtn = (
-    e: React.MouseEvent, 
-    isDraggingVolume: boolean, 
-    setCurrentVolume: (volume: number) => void,
-    videoRef: RefObject<HTMLVideoElement | null>
-) => {
-    if (!isDraggingVolume || !videoRef.current) return
+// export const handleMouseMoveSoundBtn = (
+//     e: React.MouseEvent, 
+//     isDraggingVolume: boolean, 
+//     setCurrentVolume: (volume: number) => void,
+//     videoRef: RefObject<HTMLVideoElement | null>
+// ) => {
+//     if (!isDraggingVolume || !videoRef.current) return
 
-    const soundVolumeBackgroundBar = document.getElementById('soundVolumeBackground')
-    if (!soundVolumeBackgroundBar) return
+//     const soundVolumeBackgroundBar = document.getElementById('soundVolumeBackground')
+//     if (!soundVolumeBackgroundBar) return
 
-    const positionOfSoundBar = soundVolumeBackgroundBar.getBoundingClientRect()
-    const newVolume = (e.clientX - positionOfSoundBar.left) / positionOfSoundBar.width
-    const clampedVolume = Math.max(0, Math.min(1, newVolume))
+//     const positionOfSoundBar = soundVolumeBackgroundBar.getBoundingClientRect()
+//     const newVolume = (e.clientX - positionOfSoundBar.left) / positionOfSoundBar.width
+//     const clampedVolume = Math.max(0, Math.min(1, newVolume))
 
-    videoRef.current.volume = clampedVolume
-    setCurrentVolume(clampedVolume * 100)
-}
+//     videoRef.current.volume = clampedVolume
+//     setCurrentVolume(clampedVolume * 100)
+// }

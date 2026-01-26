@@ -14,11 +14,9 @@ import styles from './styles.module.scss'
 
 
 export const PlayerTools: React.FC<IPlayerTools> = ({
-    hls, 
     duration, 
     videoRef, 
     isVisibleTools, 
-    setIsVisibleTools,
     fragments
 }) => {
     const currentTime = videoRef.current?.currentTime
@@ -28,27 +26,25 @@ export const PlayerTools: React.FC<IPlayerTools> = ({
     }
 
     return (
-        <div className={styles.toolsContainer}>
+        <div className={isVisibleTools ? styles.toolsContainer : styles.toolsContainer_hidden}>
             <div className={styles.toolsWrapper}
                 onClick={(e) => e.stopPropagation()}
             >             
                 <ProgressBar 
                     duration={duration}
                     videoRef={videoRef} 
-                    isVisibleTools={isVisibleTools} 
                     fragments={fragments}
                 />
 
-                {/* <div className={isVisibleTools ? styles.toolsBackground : styles.toolsBackground_hidden}></div> */}
                 <div className={styles.toolsBackground}></div>
                 
                 <div className={styles.toolsArea}>
 
-                    <PlayButtons videoRef={videoRef} duration={duration} isVisibleTools={isVisibleTools}/>
+                    <PlayButtons videoRef={videoRef} duration={duration}/>
 
-                    <SoundAndTimeVolume videoRef={videoRef} isVisibleTools={isVisibleTools} duration={duration} fragmentTitle={handleGetCurrentFragment()?.title}/>
+                    <SoundAndTimeVolume videoRef={videoRef} duration={duration} fragmentTitle={handleGetCurrentFragment()?.title}/>
 
-                    <SettingsButtons videoRef={videoRef} isVisibleTools={isVisibleTools} hls={hls}/>
+                    <SettingsButtons videoRef={videoRef}/>
                 </div>
             </div>
         </div>

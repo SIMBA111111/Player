@@ -11,10 +11,6 @@
     gap: 15px;
     flex-direction: row;
     align-items: center;
-
-    &_hidden {
-        display: none;
-    }
 }
 
 .soundContainer {
@@ -24,10 +20,6 @@
     gap: 15px;
     flex-direction: row;
     align-items: center;
-
-    &_hidden {
-        width: 10%;
-    }
 }
 
 .soundBtn {
@@ -58,10 +50,6 @@
     background-color: rgb(0, 255, 76);
     display: block;
     position: relative;
-
-    &_hidden {
-        display: none;
-    }
 }
 
 .pointer {
@@ -84,11 +72,6 @@
     color: white;
     font-size: 10px;
     font-weight: bold;
-
-    &_hidden {
-        pointer-events: none; // Отключаем события мыши при скрытии
-        display: none;
-    }
 }
 
 .indicateTime {
@@ -100,10 +83,6 @@
     font-weight: 600;
     user-select: none;
 
-    &_hidden {
-        display: none;
-    }
-
     &_narrowed {
         font-weight: 600;
         font-size: 20px;
@@ -113,4 +92,5 @@
 
 .fragmentTitle {
     width: 100%;
+    font-size: 18px;
 }
