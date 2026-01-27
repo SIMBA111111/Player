@@ -1,14 +1,17 @@
 'use client'
 
 import { JSX, RefObject, useEffect, useMemo, useRef, useState } from "react";
-import { usePlayerContext } from "@/app/page";
+
+import { usePlayerContext } from "@/component";
 import { getHHSStime } from "@/shared/utils/getHHSStime";
 import { IFragment } from "@/widget/video-tag/model/video-tag.interface";
+
 import {
     handleMouseDown, 
     handleMouseOverOnProgressBar, 
     handleProgressClick 
 } from "../lib/handlers";
+
 import styles from './styles.module.scss';
 
 interface IProgressBar {

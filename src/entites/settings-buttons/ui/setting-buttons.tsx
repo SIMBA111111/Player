@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 
-import { usePlayerContext } from '@/app/page'
+import { usePlayerContext } from '@/component'
 
 import { closeModal, goBack, handleChangeVideoSpeed, handleOpenFullScreen, openModal } from '../lib/handlers'
 import { ISettingsButtons, ModalType } from '../models/settings-buttons.interface'

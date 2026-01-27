@@ -4,7 +4,7 @@ import { RefObject } from "react"
 
 import { handleRewind, handleForward } from "../lib/handlers"
 
-import { usePlayerContext } from "@/app/page"
+import { usePlayerContext } from "@/component"
 
 import styles from './styles.module.scss'
 

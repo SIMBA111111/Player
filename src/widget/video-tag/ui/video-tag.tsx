@@ -3,7 +3,7 @@
 import { RefObject, useRef, useState } from "react"
 
 import { PlayerTools } from "@/features/player-tools/ui/player-tools"
-import { usePlayerContext } from "@/app/page"
+import { usePlayerContext } from "@/component"
 
 import { VideoTagHandlers } from "../lib/handlers"
 import { IVideoTag } from "../model/video-tag.interface"
