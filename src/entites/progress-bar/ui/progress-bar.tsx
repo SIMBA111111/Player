@@ -2,9 +2,9 @@
 
 import { JSX, RefObject, useEffect, useMemo, useRef, useState } from "react";
 
-import { usePlayerContext } from "@/component";
-import { getHHSStime } from "@/shared/utils/getHHSStime";
-import { IFragment } from "@/widget/video-tag/model/video-tag.interface";
+import { usePlayerContext } from "../../../component";
+import { getHHSStime } from "../../../shared/utils/getHHSStime";
+import { IFragment } from "../../../widget/video-tag/model/video-tag.interface";
 
 import {
     handleMouseDown, 

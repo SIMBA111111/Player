@@ -4,7 +4,11 @@ import { RefObject } from "react"
 
 import { handleRewind, handleForward } from "../lib/handlers"
 
-import { usePlayerContext } from "@/component"
+import { usePlayerContext } from "../../../component"
+import rewindIcon from '../../../assets/images/png/rewind10_bold.png'
+import frowardIcon from '../../../assets/images/png/forward10_Bold.png'
+import playIcon from '../../../assets/images/png/play-btn.png'
+import stopIcon from '../../../assets/images/png/stop-btn.png'
 
 import styles from './styles.module.scss'
 
@@ -33,7 +37,7 @@ export const PlayButtons: React.FC<IPlayButtons> = ({videoRef, duration}) => {
                     handleRewind(videoRef, duration, context)
                 }}
             >
-                <img src="/images/png/forward10_Bold.png" alt="" height={30}/>
+                <img src={rewindIcon.src} alt="" height={30}/>
             </button>
             
             <button 
@@ -43,9 +47,9 @@ export const PlayButtons: React.FC<IPlayButtons> = ({videoRef, duration}) => {
                 }}
             >
                 {videoRef.current.paused ? 
-                        <img className={styles.playBtn} src="/images/png/play-btn.png" alt="" height={24} />
+                        <img className={styles.playBtn} src={playIcon.src} alt="" height={24} />
                     : 
-                        <img className={styles.pauseBtn} src="/images/png/stop-btn.png" alt="" height={24} />
+                        <img className={styles.pauseBtn} src={stopIcon.src} alt="" height={24} />
                 }
             </button>
             
@@ -55,7 +59,7 @@ export const PlayButtons: React.FC<IPlayButtons> = ({videoRef, duration}) => {
                     handleForward(videoRef, duration, context)
                 }}
             >
-                <img src="/images/png/rewind10_Bold.png" alt="" height={30}/>
+                <img src={frowardIcon.src} alt="" height={30}/>
             </button>
         </div>
     )

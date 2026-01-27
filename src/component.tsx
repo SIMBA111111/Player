@@ -3,7 +3,7 @@
 import Hls from "hls.js";
 import { createContext, RefObject, useCallback, useContext, useEffect, useRef, useState } from "react";
 
-import { VideoTag } from "@/widget/video-tag/ui/video-tag";
+import { VideoTag } from "./widget/video-tag/ui/video-tag";
 import React from "react";
 import { IFragment } from "@/widget/video-tag/model/video-tag.interface";
 

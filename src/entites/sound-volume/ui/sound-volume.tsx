@@ -2,7 +2,7 @@
 
 import React, { RefObject, useEffect, useState } from 'react'
 
-import { getHHSStime } from '@/shared/utils/getHHSStime'
+import { getHHSStime } from '../../../shared/utils/getHHSStime'
 
 import { 
 
@@ -11,6 +11,9 @@ import {
     handleMouseUpSoundBtn, 
     handleMuteOnClick 
 } from '../lib/handlers'
+
+import soundOnIcon from '../../../assets/images/png/sound.png'
+import soundOffIcon from '../../../assets/images/png/sound-off.png'
 
 import styles from './styles.module.scss'
 
@@ -93,7 +96,7 @@ export const SoundAndTimeVolume: React.FC<ISoundVolume> = ({videoRef, duration, 
                     className={styles.soundBtn} 
                     onClick={() => handleMuteOnClick(videoRef, setCurrentVolume)}
                 >
-                    {currentVolume ? <img src="/images/png/sound.png" alt="Sound" height={30}/> : <img src="/images/png/sound-off.png" alt="Sound off" height={30}/>}    
+                    {currentVolume ? <img src={soundOnIcon.src} alt="Sound" height={30}/> : <img src={soundOffIcon.src} alt="Sound off" height={30}/>}    
                 </button> 
                 
                 <div 

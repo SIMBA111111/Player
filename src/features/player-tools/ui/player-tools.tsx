@@ -2,11 +2,11 @@
 
 import { useState } from "react";
 
-import { ProgressBar } from '@/entites/progress-bar'
-import { SettingsButtons } from "@/entites/settings-buttons";
-import { PlayButtons } from "@/entites/play-buttons";
-import { SoundAndTimeVolume } from "@/entites/sound-volume";
-import { IFragment } from "@/widget/video-tag/model/video-tag.interface";
+import { ProgressBar } from '../../../entites/progress-bar'
+import { SettingsButtons } from "../../../entites/settings-buttons";
+import { PlayButtons } from "../../../entites/play-buttons";
+import { SoundAndTimeVolume } from "../../../entites/sound-volume";
+import { IFragment } from "../../../widget/video-tag/model/video-tag.interface";
 
 import { IPlayerTools } from "../model/player-tools.interface";
 
@@ -22,7 +22,7 @@ export const PlayerTools: React.FC<IPlayerTools> = ({
     const currentTime = videoRef.current?.currentTime
 
     const handleGetCurrentFragment = () => {
-        return fragments.find((fragment: IFragment) => fragment.start < currentTime && currentTime < fragment.end )
+        return fragments?.find((fragment: IFragment) => fragment.start < currentTime && currentTime < fragment.end )
     }
 
     return (

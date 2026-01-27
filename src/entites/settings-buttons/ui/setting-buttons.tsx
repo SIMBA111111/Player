@@ -2,10 +2,14 @@
 
 import { useEffect, useState } from 'react'
 
-import { usePlayerContext } from '@/component'
+import { usePlayerContext } from '../../../component'
 
 import { closeModal, goBack, handleChangeVideoSpeed, handleOpenFullScreen, openModal } from '../lib/handlers'
 import { ISettingsButtons, ModalType } from '../models/settings-buttons.interface'
+
+import settingIcon from '../../../assets/images/png/settings-icon.png'
+import fullScreenOffIcon from '../../../assets/images/png/full-screen-off.png'
+import fullScreenOnIcon from '../../../assets/images/png/full-screen-on.png'
 
 import styles from './styles.module.scss'
 
@@ -39,9 +43,6 @@ export const SettingsButtons: React.FC<ISettingsButtons> = ({videoRef}) => {
         closeModal(modalHistory, setModalHistory, setActiveModal)
     }
 
-    console.log('modalHistory = ', modalHistory);
-    
-
     return (
         <div className={styles.settingsContainer}>
             <div id='settingsWrapper' className={styles.settingsWrapper}>
@@ -49,7 +50,7 @@ export const SettingsButtons: React.FC<ISettingsButtons> = ({videoRef}) => {
                     className={styles.settings} 
                     onClick={() => openModal('settings', setModalHistory, setActiveModal)}
                 >
-                    <img src="/images/png/settings-icon.png" alt="" height={30}/>
+                    <img src={settingIcon.src} alt="" height={30}/>
                 </button>
                 
                 {/* Основная модалка настроек */}
@@ -100,7 +101,7 @@ export const SettingsButtons: React.FC<ISettingsButtons> = ({videoRef}) => {
                 )}
             </div>
             <button className={styles.fullScreen} onClick={(e: any) => handleOpenFullScreen(isFull, setIsFull)}>
-                {isFull ? <img src={'/images/png/full-screen-off.png'} className={styles.fullScreenImg} /> : <img src={'/images/png/full-screen-on.png'} className={styles.fullScreenImg}/>}
+                {isFull ? <img src={fullScreenOffIcon.src} className={styles.fullScreenImg} /> : <img src={fullScreenOnIcon.src} className={styles.fullScreenImg}/>}
             </button>
         </div>
     )
