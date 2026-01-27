@@ -2,7 +2,9 @@
 
 import { RefObject } from "react"
 
-import { handleRewind, handlePlayPause, handleForward } from "../lib/handlers"
+import { handleRewind, handleForward } from "../lib/handlers"
+
+import { usePlayerContext } from "@/component"
 
 import styles from './styles.module.scss'
 
@@ -10,13 +12,10 @@ import styles from './styles.module.scss'
 interface IPlayButtons {
     videoRef: RefObject<HTMLVideoElement | null>
     duration: number;
-    isVisibleTools: boolean
-    setProgress: (progress: number) => void;
-    paused: boolean;
-    setPaused: (paused: boolean) => void
 }   
 
-export const PlayButtons: React.FC<IPlayButtons> = ({videoRef, duration, isVisibleTools, setProgress, paused, setPaused}) => {
+export const PlayButtons: React.FC<IPlayButtons> = ({videoRef, duration}) => {
+    const context = usePlayerContext();
 
     if (!videoRef || !videoRef.current) {
         return (
@@ -29,40 +28,31 @@ export const PlayButtons: React.FC<IPlayButtons> = ({videoRef, duration, isVisib
     return (
         <div className={styles.toolsBtns}>
             <button 
-                // className={isVisibleTools ? styles.rewindBtn : styles.rewindBtn_hidden} 
                 className={styles.rewindBtn} 
                 onClick={(e: any) => {
-                    handleRewind(videoRef, setProgress, duration)
+                    handleRewind(videoRef, duration, context)
                 }}
             >
                 <img src="/images/png/forward10_Bold.png" alt="" height={30}/>
             </button>
             
             <button 
-                // className={isVisibleTools ? styles.playBtn : styles.playBtn_hidden} 
                 className={styles.playBtnWrap} 
                 onClick={(e: any) => {
-                    // e.stopPropagation()
-                    // e.preventDefault()
-                    handlePlayPause(videoRef, setPaused)
+                    context.setIsPaused((prev: boolean) => !prev)
                 }}
             >
-                {paused ? 
-                    <div className={styles.playBtn}>
-                        <img src="/images/png/play-btn.png" alt="" height={24} />
-                    </div> 
+                {videoRef.current.paused ? 
+                        <img className={styles.playBtn} src="/images/png/play-btn.png" alt="" height={24} />
                     : 
-                    <div className={styles.pauseBtn}>
-                        <img src="/images/png/stop-btn.png" alt="" height={24} />
-                    </div>
+                        <img className={styles.pauseBtn} src="/images/png/stop-btn.png" alt="" height={24} />
                 }
             </button>
             
             <button 
-                // className={isVisibleTools ? styles.forwardBtn : styles.forwardBtn_hidden} 
                 className={styles.forwardBtn} 
                 onClick={(e: any) => {
-                    handleForward(videoRef, setProgress, duration)
+                    handleForward(videoRef, duration, context)
                 }}
             >
                 <img src="/images/png/rewind10_Bold.png" alt="" height={30}/>

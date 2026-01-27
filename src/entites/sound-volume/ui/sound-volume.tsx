@@ -1,23 +1,27 @@
 "use client"
 
 import React, { RefObject, useEffect, useState } from 'react'
+
+import { getHHSStime } from '@/shared/utils/getHHSStime'
+
 import { 
+
     handleMouseClickSoundBtn, 
     handleMouseDownSoundBtn, 
     handleMouseUpSoundBtn, 
-    handleMouseMoveSoundBtn, 
     handleMuteOnClick 
 } from '../lib/handlers'
-import { getHHSStime } from '@/shared/utils/getHHSStime'
+
 import styles from './styles.module.scss'
+
 
 interface ISoundVolume {
     videoRef: RefObject<HTMLVideoElement | null>
-    isVisibleTools: boolean;
     duration: number;
+    fragmentTitle: string | undefined;
 }  
 
-export const SoundAndTimeVolume: React.FC<ISoundVolume> = ({videoRef, isVisibleTools, duration}) => {
+export const SoundAndTimeVolume: React.FC<ISoundVolume> = ({videoRef, duration, fragmentTitle}) => {
     const [isVisibleSoundBar, setIsVisibleSoundBar] = useState<boolean>(false)
     const [currentVolume, setCurrentVolume] = useState<number>(50)
     const [isDraggingVolume, setIsDraggingVolume] = useState<boolean>(false)
@@ -76,7 +80,6 @@ export const SoundAndTimeVolume: React.FC<ISoundVolume> = ({videoRef, isVisibleT
     if(!videoRef.current) return null
 
     return (
-        // <div className={isVisibleTools ? styles.soundAndTimeContainer : styles.soundAndTimeContainer_hidden}>
         <div className={styles.soundAndTimeContainer}>
             <div className={isVisibleSoundBar ? styles.soundContainer : styles.soundContainer_hidden} 
                 onMouseEnter={() => setIsVisibleSoundBar(true)}
@@ -90,7 +93,7 @@ export const SoundAndTimeVolume: React.FC<ISoundVolume> = ({videoRef, isVisibleT
                     className={styles.soundBtn} 
                     onClick={() => handleMuteOnClick(videoRef, setCurrentVolume)}
                 >
-                    <img src="/images/png/sound.png" alt="Sound" height={30}/>    
+                    {currentVolume ? <img src="/images/png/sound.png" alt="Sound" height={30}/> : <img src="/images/png/sound-off.png" alt="Sound off" height={30}/>}    
                 </button> 
                 
                 <div 
@@ -98,8 +101,6 @@ export const SoundAndTimeVolume: React.FC<ISoundVolume> = ({videoRef, isVisibleT
                     className={isVisibleSoundBar ? styles.soundVolumeBackground : styles.soundVolumeBackground_hidden} 
                     onClick={(e) => handleMouseClickSoundBtn(e, videoRef, setCurrentVolume)}
                     onMouseDown={(e) => handleMouseDownSoundBtn(setIsDraggingVolume)}
-                    onMouseUp={(e) => handleMouseUpSoundBtn(setIsDraggingVolume)}
-                    onMouseMove={(e) => handleMouseMoveSoundBtn(e, isDraggingVolume, setCurrentVolume, videoRef)}
                 >
                     <div 
                         id='filledSoundBar' 
@@ -124,6 +125,8 @@ export const SoundAndTimeVolume: React.FC<ISoundVolume> = ({videoRef, isVisibleT
             <div className={styles.indicateTime}>
                 {getHHSStime(Math.trunc(currentTime))} / {getHHSStime(Math.trunc(duration))} 
             </div>
+
+            <div className={styles.fragmentTitle}>{fragmentTitle}</div>
         </div>
     )
 }

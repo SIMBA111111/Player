@@ -13,6 +13,16 @@ body {
     gap: 20px;
     align-items: center;
     justify-content: center;
+
+    opacity: 1;
+    visibility: visible;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+
+    &_hidden {
+        transition: opacity 0.3s ease, visibility 0.3s ease;
+        opacity: 0;
+        visibility: hidden;
+    }
 }
 
 .toolsWrapper {
@@ -35,10 +45,6 @@ body {
     background-color: rgba(255, 255, 255, 0.7); 
     pointer-events: none;
     z-index: 5;
-
-    &_hidden {
-        display: none;
-    }
 }
 
 .toolsArea {
@@ -51,18 +57,4 @@ body {
     justify-content: end;
     align-items: end;
     z-index: 50;
-}
-
-.indicateTime {
-    position: absolute;
-    color: rgb(0, 0, 0);
-    font-size: 20px;
-    height: 60%;
-    width: 100%;
-    left: 21%;
-    font-weight: 600;
-
-    &_hidden {
-        display: none;
-    }
 }

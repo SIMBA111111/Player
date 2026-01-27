@@ -1,4 +1,4 @@
-import { HlsEventEmitter } from "hls.js";
+import Hls from "hls.js";
 import { RefObject } from "react";
 
 export interface IFragment{
@@ -8,7 +8,7 @@ export interface IFragment{
 }
 
 export interface IVideoTag {
-    hls: HlsEventEmitter
+    hls: Hls
     duration: number
     videoRef: RefObject<HTMLVideoElement | null>
     fragments: IFragment[]

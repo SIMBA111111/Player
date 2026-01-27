@@ -1,99 +1,53 @@
 'use client'
 
-import { RefObject, useContext, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
-import { Modal, ModalProvider } from '@/shared/ui'
-import { ModalContext } from '@/shared/ui/modal/modal'
+import { usePlayerContext } from '@/component'
 
-import { handleChangeVideoSpeed } from '../lib/handlers'
+import { closeModal, goBack, handleChangeVideoSpeed, handleOpenFullScreen, openModal } from '../lib/handlers'
+import { ISettingsButtons, ModalType } from '../models/settings-buttons.interface'
 
 import styles from './styles.module.scss'
-interface ISettingsButtons {
-    videoRef: RefObject<any>;
-    isVisibleTools: boolean;
-    hls: any
-}
 
-type ModalType = 'settings' | 'quality' | 'speed' | null;
 
-export const SettingsButtons: React.FC<ISettingsButtons> = ({videoRef, isVisibleTools, hls}) => {
-    const [isFull, setisFull] = useState<boolean>(false) 
+export const SettingsButtons: React.FC<ISettingsButtons> = ({videoRef}) => {
+    const [isFull, setIsFull] = useState<boolean>(false) 
     const [activeModal, setActiveModal] = useState<ModalType>(null);
     const [modalHistory, setModalHistory] = useState<ModalType[]>([]);
+    const context = usePlayerContext()
 
     useEffect(() => {
 
         const handleClickOutSide =(e: MouseEvent) => {
             const modal = document.getElementById('settingsWrapper')
             
-            console.log(modal?.contains(e.target as Node));
-            
-
             if(!modal?.contains(e.target as Node)) {
-                closeModal()
+                closeModal(modalHistory, setModalHistory, setActiveModal)
             }
         }
 
         window.addEventListener('mousedown', handleClickOutSide) 
     }, [videoRef])
 
-    const openModal = (title: ModalType) => {
-        if (title) {
-            setModalHistory(prev => [...prev, activeModal]);
-            setActiveModal(title);
-        }
-    };
-
-    const closeModal = () => {
-        if (modalHistory.length > 0) {
-            // Возвращаемся к предыдущему состоянию
-            const previousModal = modalHistory[modalHistory.length - 1];
-            setModalHistory(prev => prev.slice(0, -1));
-            setActiveModal(previousModal);
-        } else {
-            setActiveModal(null);
-        }
-    };
-    
-    const goBack = () => {
-        if (modalHistory.length > 0) {
-            const previousModal = modalHistory[modalHistory.length - 1];
-            setModalHistory(prev => prev.slice(0, -1));
-            setActiveModal(previousModal);
-        }
-    };
-
-    const handleOpenFullScreen = () => {
-        const playerContainer = document.getElementById('playerContainer')
-        
-        if (isFull) {
-            document?.exitFullscreen()    
-            setisFull(false)
-            return ''          
-        }
-        playerContainer?.requestFullscreen()
-        setisFull(true)
-    }
-
     const handleSpeed = (value: number) => {
         handleChangeVideoSpeed(videoRef, value)
-        closeModal()
+        closeModal(modalHistory, setModalHistory, setActiveModal)
     }
 
-    const handleChangeQualityLevel = (index: number) => {
-        console.log('index: ', index);
-        hls.currentLevel = index
-        closeModal()
-        
+    const handleChangeQualityLevel = (newQualityLevel: number) => {
+        context.hls.currentLevel = newQualityLevel
+        closeModal(modalHistory, setModalHistory, setActiveModal)
     }
+
+    console.log('modalHistory = ', modalHistory);
+    
 
     return (
-        // <div className={isVisibleTools ? styles.settingsContainer : styles.settingsContainer_hidden}>
         <div className={styles.settingsContainer}>
             <div id='settingsWrapper' className={styles.settingsWrapper}>
                 <button 
                     className={styles.settings} 
-                    onClick={() => openModal('settings')}
+                    onClick={() => openModal('settings', setModalHistory, setActiveModal)}
                 >
                     <img src="/images/png/settings-icon.png" alt="" height={30}/>
                 </button>
@@ -101,14 +55,13 @@ export const SettingsButtons: React.FC<ISettingsButtons> = ({videoRef, isVisible
                 {/* Основная модалка настроек */}
                 {activeModal === 'settings' && (
                     <div className={styles.modal}>
-                        {/* <h3 className={styles.modalHeader}>Settings</h3> */}
-                            <button className={styles.modalBtn} onClick={() => openModal('quality')}>
+                            <button className={styles.modalBtn} onClick={() => openModal('quality', setModalHistory, setActiveModal)}>
                                 <div className={styles.modalBtnContainer}>
                                     <div>Quality</div>
-                                    <div>{`${hls.levels[hls.currentLevel].height}p`}</div>
+                                    <div>{`${context.hls.levels[context.hls.currentLevel].height}p`}</div>
                                 </div>
                             </button>
-                            <button className={styles.modalBtn} onClick={() => openModal('speed')}>
+                            <button className={styles.modalBtn} onClick={() => openModal('speed', setModalHistory, setActiveModal)}>
                                 <div className={styles.modalBtnContainer}>
                                     <div className={styles.speedLabel}>Speed</div>
                                     <div className={styles.speedValue}>
@@ -121,9 +74,9 @@ export const SettingsButtons: React.FC<ISettingsButtons> = ({videoRef, isVisible
                 
                 {/* Вложенная модалка качества */}
                 {activeModal === 'quality' && (
-                    <div className={styles.modal} onClick={goBack}>
+                    <div className={styles.modal} onClick={() => goBack(modalHistory, setModalHistory, setActiveModal)}>
                         <h3 className={styles.modalHeader}>{'<'} Quality</h3>
-                        {hls.levels.map((level: any, index: number) => {
+                        {context.hls.levels.map((level: any, index: number) => {
                             return (
                                 <button className={styles.modalBtn} key={index} onClick={() => handleChangeQualityLevel(index)}>{level.height}p</button>
                             )
@@ -133,7 +86,7 @@ export const SettingsButtons: React.FC<ISettingsButtons> = ({videoRef, isVisible
                 
                 {/* Вложенная модалка скорости */}
                 {activeModal === 'speed' && (
-                    <div className={styles.modal} onClick={goBack}>
+                    <div className={styles.modal} onClick={() => goBack(modalHistory, setModalHistory, setActiveModal)}>
                         <h3 className={styles.modalHeader}>{'<'} Speed</h3>
                         <button className={styles.modalBtn} onClick={()=> handleSpeed(0.25)}>0.25x</button>
                         <button className={styles.modalBtn} onClick={()=> handleSpeed(0.5)}>0.5x</button>
@@ -146,8 +99,8 @@ export const SettingsButtons: React.FC<ISettingsButtons> = ({videoRef, isVisible
                     </div>
                 )}
             </div>
-            <button className={styles.fullScreen} onClick={(e: any) => handleOpenFullScreen()}>
-                full screen
+            <button className={styles.fullScreen} onClick={(e: any) => handleOpenFullScreen(isFull, setIsFull)}>
+                {isFull ? <img src={'/images/png/full-screen-off.png'} className={styles.fullScreenImg} /> : <img src={'/images/png/full-screen-on.png'} className={styles.fullScreenImg}/>}
             </button>
         </div>
     )

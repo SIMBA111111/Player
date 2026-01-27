@@ -1,5 +1,5 @@
 .soundAndTimeContainer {
-    width: 30%;
+    width: 65%;
     height: 35%;
     position: absolute;
     top: 35%;
@@ -11,23 +11,15 @@
     gap: 15px;
     flex-direction: row;
     align-items: center;
-
-    &_hidden {
-        display: none;
-    }
 }
 
 .soundContainer {
-    width: 100%;
+    width: 40%;
     cursor: pointer;
     display: flex;
     gap: 15px;
     flex-direction: row;
     align-items: center;
-
-    &_hidden {
-        width: 10%;
-    }
 }
 
 .soundBtn {
@@ -58,10 +50,6 @@
     background-color: rgb(0, 255, 76);
     display: block;
     position: relative;
-
-    &_hidden {
-        display: none;
-    }
 }
 
 .pointer {
@@ -84,23 +72,25 @@
     color: white;
     font-size: 10px;
     font-weight: bold;
-
-    &_hidden {
-        pointer-events: none; // Отключаем события мыши при скрытии
-        display: none;
-    }
 }
 
 .indicateTime {
     color: rgb(0, 0, 0);
     font-size: 20px;
     height: 60%;
-    width: 100%;
+    width: 30%;
     left: 21%;
     font-weight: 600;
     user-select: none;
 
-    &_hidden {
-        display: none;
+    &_narrowed {
+        font-weight: 600;
+        font-size: 20px;
+        width: 20%;
     }
+}
+
+.fragmentTitle {
+    width: 100%;
+    font-size: 18px;
 }

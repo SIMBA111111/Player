@@ -1,114 +1,62 @@
+.progressContainer {
+    position: relative;
+    width: 100%;
+    height: 8px;
+    cursor: pointer;
+    overflow: hidden;
+    border-radius: 0px;
+}
+
+.background {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #333;
+    z-index: 0;
+}
+
+.fragment {
+    // position: absolute;
+    height: 100%;
+    top: 0;
+    z-index: 1;
+    // pointer-events: none;
+    // border-radius: 200px;
+    background-repeat: no-repeat;
+    background-size: 100% 100%;
+
+    &:hover {
+        top: 5px;
+        height: 20px;
+    }
+}
+
 .progressTimeHover {
     position: absolute;
-    display: block;
-    top: -50px;
-    color: #fff;
-    background-color: red;
-    padding: 10 15 10 15;
-    width: 3%;
+    bottom: 130px;
     transform: translateX(-50%);
-    
-    &_hidden {
-        display: none;
-    }
+    background: rgba(0, 0, 0, 0.8);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    white-space: nowrap;
+    z-index: 100;
 }
 
-.progressContainer {
+.progressTimeHover_hidden {
+    display: none;
+}
+
+.fragmentsContainer {
+    top: 0;
+    left: 0;
+    height: 10px;
     width: 100%;
-    cursor: pointer;
-
-    &_hidden {
-        display: none;
-    }
-    
-    // &:hover {
-    //     .progressFilled {
-    //         height: 15px;
-    //     }
-        
-    //     .progressBackground {
-    //         height: 15px;
-    //     }
-    // }
-}
-
-.progressBackgroundContainer {
+    position: absolute;
     display: flex;
     flex-direction: row;
-    gap: 15px;
-}
-
-.progressBackground {
-    position: relative;
-    max-width: 100%;
-    height: 10px;
-    background-color: rgba(60, 255, 0, 0.3);
-    border-radius: 2px;
-    transition: height 0.2s ease;
-
-    &:hover {
-        .progressFilled {
-            height: 15px;
-        }
-        
-        .progressBackground {
-            height: 15px;
-        }
-    }
-}
-
-// .progressFilledContainer {
-//     position: absolute;
-//     display: flex;
-//     flex-direction: row;
-//     gap: 15px;
-// }
-
-.progressFilled {
-    // position: absolute;
-    height: 10px;
-    background: linear-gradient(90deg, #ff0080, #ff2e00);
-    border-radius: 2px;
-    &:hover {
-        .progressFilled {
-            height: 15px;
-        }
-        
-        .progressBackground {
-            height: 15px;
-        }
-    }
-}
-
-.progressBuffered {
-    position: absolute;
-    height: 10px;
-    background: linear-gradient(90deg, #ffffff, #ffffff);
-    border-radius: 2px;
-    // transition: width 0.1s linear, height 0.2s ease;
-    &:hover {
-        .progressFilled {
-            height: 15px;
-        }
-        
-        .progressBackground {
-            height: 15px;
-        }
-    }
-}
-
-.progressThumb {
-    position: absolute;
-    margin-top: 7px;
-    margin-left: -10px;
-    top: 90%;
-    transform: translate(-50%, -50%) scale(0);
-    width: 30px;
-    height: 30px;
-    background: white;
-    border-radius: 50%;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-    opacity: 0;
-    transition: all 0.2s ease;
-    pointer-events: none;
+    gap: 2px;
 }
