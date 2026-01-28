@@ -1,0 +1,11 @@
+#EXTM3U
+#EXT-X-VERSION:3
+#EXT-X-TARGETDURATION:4
+#EXT-X-MEDIA-SEQUENCE:0
+#EXTINF:4.166667,
+hls_output/master0.vtt
+#EXTINF:4.166667,
+hls_output/master1.vtt
+#EXTINF:1.283333,
+hls_output/master2.vtt
+#EXT-X-ENDLIST

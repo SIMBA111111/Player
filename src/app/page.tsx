@@ -3,21 +3,14 @@
 import Player from "@/component";
 
 const VIDEODATA = {
-  // url: '/videos/hls_output/output.m3u8',
-  // duration: 4.766,
-  
-  
-  // url: '/videos/sound/sound1440p.m3u8',
-  // duration: 9.633,
-  
-  
-  // url: '/videos/test3/master-playlist.m3u8',
-  // duration: 42.333,
-  
-  
-  url: '/videos/long-video/longVideo.m3u8',
-  duration: 552.333,
+  url: '/videos/hls_output/master.m3u8',
+  duration: 9.333,
   fragments: []
+
+
+  // url: '/videos/long-video/longVideo.m3u8',
+  // duration: 552.333,
+  // fragments: []
   // fragments: [
   //   {
   //     start: 0.000,
