@@ -7,9 +7,10 @@ import { getHHSStime } from "../../../shared/utils/getHHSStime";
 import { IFragment } from "../../../widget/video-tag/model/video-tag.interface";
 
 import {
-    handleMouseDown, 
-    handleMouseOverOnProgressBar, 
-    handleProgressClick 
+    getProgressBarFragments,
+    handleClick,
+    handleMouseDown,
+    handleMouseOver, 
 } from "../lib/handlers";
 
 import styles from './styles.module.scss';
@@ -58,90 +59,6 @@ export const ProgressBar: React.FC<IProgressBar> = ({
         };
     }, [videoRef, duration, isDragging]);
 
-    // Создаем фрагменты через useMemo с зависимостью от currentVideoTime
-    const fragmentElements = useMemo(() => {
-        if (!duration || fragments.length === 0) return [];
-        
-        const elements: JSX.Element[] = [];
-        
-        fragments.forEach((fragment, index) => {
-            const fragmentStartPercent = (fragment.start / duration) * 100;
-            const fragmentEndPercent = (fragment.end / duration) * 100;
-            const fragmentWidthPercent = fragmentEndPercent - fragmentStartPercent;
-            
-            // Вычисляем прогресс внутри фрагмента (0-100%)
-            let progressPercent = 0;
-            if (currentVideoTime >= fragment.end) {
-                progressPercent = 100;
-            } else if (currentVideoTime > fragment.start) {
-                progressPercent = ((currentVideoTime - fragment.start) / (fragment.end - fragment.start)) * 100;
-            }
-            
-            // Собираем буферизированные части
-            const bufferStops: Array<{start: number, end: number}> = [];
-            bufferedFragments.forEach(buffered => {
-                const overlapStart = Math.max(fragment.start, buffered.start);
-                const overlapEnd = Math.min(fragment.end, buffered.end);
-                
-                if (overlapStart < overlapEnd) {
-                    const bufferStartPercent = ((overlapStart - fragment.start) / (fragment.end - fragment.start)) * 100;
-                    const bufferEndPercent = ((overlapEnd - fragment.start) / (fragment.end - fragment.start)) * 100;
-                    
-                    // Только буфер после текущего времени
-                    if (bufferEndPercent > progressPercent) {
-                        bufferStops.push({
-                            start: Math.max(bufferStartPercent, progressPercent),
-                            end: bufferEndPercent
-                        });
-                    }
-                }
-            });
-            
-            // Создаем градиент (упрощенная версия для производительности)
-            const gradientStops: string[] = [];
-            
-            // Если есть прогресс
-            if (progressPercent > 0) {
-                gradientStops.push('#1e90ff 0%');
-                gradientStops.push(`#1e90ff ${progressPercent}%`);
-                gradientStops.push(`#444 ${progressPercent}%`);
-            } else {
-                gradientStops.push('#444 0%');
-            }
-            
-            // Буферные зоны
-            bufferStops.forEach(buffer => {
-                gradientStops.push(`#666 ${buffer.start}%`);
-                gradientStops.push(`#666 ${buffer.end}%`);
-            });
-            
-            // Добавляем фон в конце
-            const lastValue = gradientStops.length > 0 
-                ? parseFloat(gradientStops[gradientStops.length - 1].split(' ')[1].replace('%', ''))
-                : 0;
-                
-            if (lastValue < 100) {
-                gradientStops.push(`#444 ${Math.max(lastValue, progressPercent)}%`);
-                gradientStops.push(`#444 100%`);
-            }
-            
-            const gradient = `linear-gradient(to right, ${gradientStops.join(', ')})`;
-            
-            elements.push(
-                <div 
-                    key={index}
-                    className={styles.fragment}
-                    style={{
-                        left: `${fragmentStartPercent}%`,
-                        width: `${fragmentWidthPercent}%`,
-                        background: gradient,
-                    }}
-                />
-            );
-        });
-        
-        return elements;
-    }, [fragments, duration, bufferedFragments, currentVideoTime]); // Зависим от currentVideoTime вместо progress
 
     // Оптимизированный хендлер для перетаскивания
     useEffect(() => {
@@ -197,13 +114,17 @@ export const ProgressBar: React.FC<IProgressBar> = ({
 
         // Ставим видео на паузу при начале перетаскивания
         context.setIsPaused(true);
+
+        const playerContainer = document.getElementById('playerContainer')
+
+        if(!playerContainer) return
         
-        document.addEventListener('mousemove', handleMouseMoveWrapper, {passive: true});
-        document.addEventListener('mouseup', handleMouseUpWrapper, {passive: true});
+        playerContainer.addEventListener('mousemove', handleMouseMoveWrapper, {passive: true});
+        playerContainer.addEventListener('mouseup', handleMouseUpWrapper, {passive: true});
 
         return () => {
-            document.removeEventListener('mousemove', handleMouseMoveWrapper);
-            document.removeEventListener('mouseup', handleMouseUpWrapper);
+            playerContainer.removeEventListener('mousemove', handleMouseMoveWrapper);
+            playerContainer.removeEventListener('mouseup', handleMouseUpWrapper);
             context.setIsPaused(false);
         };
     }, [isDragging, duration, videoRef, context]);
@@ -236,27 +157,6 @@ export const ProgressBar: React.FC<IProgressBar> = ({
         };
     }, [videoRef]);
 
-    // Упрощенные хендлеры для мыши
-    const handleMouseOver = (e: React.MouseEvent) => {
-        if (!isDragging && progressContainerRef.current && duration) {
-            const rect = progressContainerRef.current.getBoundingClientRect();
-            const clickPosition = Math.min(Math.max(e.clientX - rect.left, 0), rect.width);
-            const newTime = (clickPosition / rect.width) * duration;
-            setHoverTime(newTime);
-        }
-    };
-
-    const handleClick = (e: React.MouseEvent) => {
-        if (!isDragging && progressContainerRef.current && duration) {
-            const rect = progressContainerRef.current.getBoundingClientRect();
-            const clickPosition = Math.min(Math.max(e.clientX - rect.left, 0), rect.width);
-            const newTime = (clickPosition / rect.width) * duration;
-            
-            videoRef.current!.currentTime = newTime;
-            setCurrentVideoTime(newTime);
-        }
-    };
-
     return (
         <>
             <div 
@@ -273,7 +173,7 @@ export const ProgressBar: React.FC<IProgressBar> = ({
                 id="progressBar"
                 ref={progressContainerRef}
                 className={styles.progressContainer}
-                onClick={handleClick}
+                onClick={(e: React.MouseEvent) => handleClick(e, isDragging, duration, progressContainerRef, videoRef, setCurrentVideoTime)}
                 onMouseDown={(e: any) => { 
                     handleMouseDown(e, setIsDragging);
                 }}
@@ -282,11 +182,11 @@ export const ProgressBar: React.FC<IProgressBar> = ({
                         setHoverTime(0);
                     }
                 }}
-                onMouseMove={handleMouseOver}
+                onMouseMove={(e: React.MouseEvent) => handleMouseOver(e, isDragging, duration, progressContainerRef, setHoverTime)}
             >
                 {/* Фрагменты прогресса */}
                 <div className={styles.fragmentsContainer}>
-                    {fragmentElements}
+                    {getProgressBarFragments({duration, fragments,bufferedFragments, currentVideoTime })}
                 </div>
             </div>
         </>

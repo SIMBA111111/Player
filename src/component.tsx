@@ -120,7 +120,7 @@ export default function Player(props: IPlayer) {
 
   return (
     <PlayerProvider videoRef={videoRef} hls={hls}>
-      <VideoTag hls={hls} duration={props.duration} videoRef={videoRef} fragments={props.fragments}/>
+      <VideoTag duration={props.duration} videoRef={videoRef} fragments={props.fragments}/>
     </PlayerProvider>
   );
 }

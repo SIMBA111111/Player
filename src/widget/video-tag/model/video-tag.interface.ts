@@ -8,7 +8,6 @@ export interface IFragment{
 }
 
 export interface IVideoTag {
-    hls: Hls
     duration: number
     videoRef: RefObject<HTMLVideoElement | null>
     fragments: IFragment[]

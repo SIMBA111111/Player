@@ -11,7 +11,7 @@ import { IVideoTag } from "../model/video-tag.interface"
 import styles from './styles.module.scss'
 
 
-export const VideoTag: React.FC<IVideoTag> = ({hls, duration, videoRef, fragments}) => {
+export const VideoTag: React.FC<IVideoTag> = ({duration, videoRef, fragments}) => {
     const [isVisibleTools, setIsVisibleTools] = useState(false)
     const hideToolsTimer = useRef<any>(null)
     const context = usePlayerContext();
