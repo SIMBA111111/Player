@@ -39,3 +39,13 @@ export const handleOpenFullScreen = (isFull: boolean, setIsFull: (isFull: boolea
         setIsFull(true)
     }
 }
+
+export const enablePictureInPicture = async(videoRef: RefObject<HTMLVideoElement>) => {
+    if (document.pictureInPictureEnabled) {
+        try {
+        await videoRef.current.requestPictureInPicture();
+        } catch (error) {
+        console.error(error);
+        }
+    }
+}
