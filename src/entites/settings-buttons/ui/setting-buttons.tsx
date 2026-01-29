@@ -87,7 +87,7 @@ export const SettingsButtons: React.FC<ISettingsButtons> = ({videoRef}) => {
                         <h3 className={styles.modalHeader}>{'<'} Quality</h3>
                         {context.hls.levels.map((level: any, index: number) => {
                             return (
-                                <button className={styles.modalBtn} key={index} onClick={() => handleChangeQualityLevel(index)}>{level.height}p</button>
+                                <button className={styles.modalBtn} key={index} onClick={() => handleChangeQualityLevel(index)}>{level?.height}p</button>
                             )
                         })}
                     </div>
