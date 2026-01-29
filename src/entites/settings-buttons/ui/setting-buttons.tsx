@@ -67,7 +67,7 @@ export const SettingsButtons: React.FC<ISettingsButtons> = ({videoRef}) => {
                             <button className={styles.modalBtn} onClick={() => openModal('quality', setModalHistory, setActiveModal)}>
                                 <div className={styles.modalBtnContainer}>
                                     <div>Quality</div>
-                                    <div>{`${context.hls.levels[context.hls.currentLevel].height}p`}</div>
+                                    <div>{`${context.hls.levels[context.hls.currentLevel]?.height}p`}</div>
                                 </div>
                             </button>
                             <button className={styles.modalBtn} onClick={() => openModal('speed', setModalHistory, setActiveModal)}>
