@@ -10,6 +10,7 @@ import { ISettingsButtons, ModalType } from '../models/settings-buttons.interfac
 import settingIcon from '../../../assets/images/png/settings-icon.png'
 import fullScreenOffIcon from '../../../assets/images/png/full-screen-off.png'
 import fullScreenOnIcon from '../../../assets/images/png/full-screen-on.png'
+import subtitleIcon from '../../../assets/images/png/subtitle.png'
 
 import styles from './styles.module.scss'
 
@@ -45,6 +46,9 @@ export const SettingsButtons: React.FC<ISettingsButtons> = ({videoRef}) => {
 
     return (
         <div className={styles.settingsContainer}>
+            <button className={styles.subtitle} onClick={(e: any) => context.hls.subtitleDisplay ? context.hls.subtitleDisplay = false : context.hls.subtitleDisplay = true}>
+                <img src={subtitleIcon.src} alt="субтитры" className={styles.subtitle__img} />
+            </button>
             <div id='settingsWrapper' className={styles.settingsWrapper}>
                 <button 
                     className={styles.settings} 

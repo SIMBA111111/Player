@@ -28,6 +28,19 @@
     }
 }
 
+.subtitle {
+    height: 30px;
+    color: #ffffff;
+    background: none;
+    cursor: pointer;
+    border: none;
+    user-select: none;
+    
+    img {
+        height: 30px;
+    }
+}
+
 .settings {
     color: #ffffff;
     background: none;

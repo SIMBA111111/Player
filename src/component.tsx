@@ -61,8 +61,9 @@ export default function Player(props: IPlayer) {
 
   const videoRef = useRef<HTMLVideoElement>(null)
   
-  const hls = new Hls({startLevel: -1, maxBufferLength: 1, lowLatencyMode: false, maxBufferSize: 10 * 1000 * 1000,
-    maxMaxBufferLength: 60,
+  const hls = new Hls({startLevel: -1, maxBufferLength: 10, lowLatencyMode: false, maxBufferSize: 10 * 1000 * 1000,
+    maxMaxBufferLength: 60, 
+    // debug: true
   })
   
   useEffect(() =>{
@@ -79,6 +80,7 @@ export default function Player(props: IPlayer) {
     
   hls.on(Hls.Events.MEDIA_ATTACHED, function () {
     console.log('video тэг и hls сбиндились');
+    
   });
 
   hls.on(Hls.Events.MEDIA_ENDED, (event, data) => {
@@ -87,10 +89,14 @@ export default function Player(props: IPlayer) {
 
   hls.on(Hls.Events.BUFFERED_TO_END, () => {
     console.log('буферезировано поллностью c уровнем: ', hls.currentLevel );
+    console.log('hls.subtitleDisplay: ', hls.subtitleDisplay );
   })
 
   hls.on(Hls.Events.BUFFER_APPENDED, () => {
     console.log('чанк добавлен');
+    console.log('hls.allSubtitleTracks: ', hls.allSubtitleTracks );
+    console.log('hls.subtitleTracks: ', hls.subtitleTracks );
+
   })
 
   hls.on(Hls.Events.MANIFEST_PARSED, () => {
@@ -117,6 +123,18 @@ export default function Player(props: IPlayer) {
     console.log('Обновлено качество: ', hls.currentLevel);
     
   })
+
+  hls.on(Hls.Events.SUBTITLE_TRACKS_UPDATED, (event, data) => {
+  console.log('SUBTITLE_TRACKS_UPDATED:', data.subtitleTracks);
+});
+
+hls.on(Hls.Events.SUBTITLE_TRACK_SWITCH, (event, data) => {
+  console.log('SUBTITLE_TRACK_SWITCH:', data);
+});
+
+hls.on(Hls.Events.ERROR, (event, data) => {
+  console.error('HLS ERROR:', data);
+});
 
   return (
     <PlayerProvider videoRef={videoRef} hls={hls}>

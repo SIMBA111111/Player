@@ -3,7 +3,12 @@
 import Player from "@/component";
 
 const VIDEODATA = {
-  url: '/videos/hls_output/master.m3u8',
+  // url: '/videos/hls_output/master.m3u8',
+  // duration: 9.333,
+  // fragments: []
+
+
+  url: '/videos/hls_output_2/master.m3u8',
   duration: 9.333,
   fragments: []
 
