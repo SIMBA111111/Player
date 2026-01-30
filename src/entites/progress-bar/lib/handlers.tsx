@@ -1,5 +1,5 @@
 import { IFragment } from "@/widget/video-tag/model/video-tag.interface";
-import { JSX, RefObject, useMemo } from "react"
+import { Dispatch, JSX, RefObject, SetStateAction, useMemo } from "react"
 import styles from '../ui/styles.module.scss'
 
     // Упрощенные хендлеры для мыши
@@ -24,10 +24,9 @@ export const handleClick = (e: React.MouseEvent, isDragging: boolean, duration: 
 };
 
 export const handleMouseDown = (
-    e: React.MouseEvent<HTMLDivElement>, 
-    setIsDragging: any, 
+    e: React.MouseEvent, 
+    setIsDragging: Dispatch<SetStateAction<boolean>>, 
 ) => {
-    console.log('handleMouseDown');
     e.preventDefault();
     setIsDragging(true);
 };

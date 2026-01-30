@@ -1,10 +1,9 @@
 'use client'
 
-import { RefObject, useRef, useState } from "react"
+import { useRef, useState } from "react"
 
 import { PlayerTools } from "../../../features/player-tools/ui/player-tools"
 import { usePlayerContext } from "../../../component"
-
 import { VideoTagHandlers } from "../lib/handlers"
 import { IVideoTag } from "../model/video-tag.interface"
 
@@ -12,17 +11,15 @@ import styles from './styles.module.scss'
 
 
 export const VideoTag: React.FC<IVideoTag> = ({duration, videoRef, fragments}) => {
-    const [isVisibleTools, setIsVisibleTools] = useState(false)
-    const hideToolsTimer = useRef<any>(null)
     const context = usePlayerContext();
 
     const {handleMouseMove, handleMouseLeave} = 
-        VideoTagHandlers(hideToolsTimer, setIsVisibleTools)
+        VideoTagHandlers(context.hideToolsTimer, context.setIsVisibleTools)
 
     return (
         <div 
             id="playerContainer" 
-            className={isVisibleTools ? styles.playerContainer : styles.playerContainer_hidden} 
+            className={context.isVisibleTools ? styles.playerContainer : styles.playerContainer_hidden} 
             onClick={() => {context.setIsPaused(prev => !prev)}} 
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
@@ -31,7 +28,7 @@ export const VideoTag: React.FC<IVideoTag> = ({duration, videoRef, fragments}) =
             <PlayerTools 
                 duration={duration} 
                 videoRef={videoRef} 
-                isVisibleTools={isVisibleTools} 
+                isVisibleTools={context.isVisibleTools} 
                 fragments={fragments}
             />
         </div>  

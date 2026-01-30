@@ -1,6 +1,6 @@
 'use client'
 
-import { RefObject } from "react"
+import { RefObject, useEffect } from "react"
 
 import { handleRewind, handleForward } from "../lib/handlers"
 
@@ -21,6 +21,35 @@ interface IPlayButtons {
 export const PlayButtons: React.FC<IPlayButtons> = ({videoRef, duration}) => {
     const context = usePlayerContext();
 
+    useEffect(() => {
+        const handleReel = (e: KeyboardEvent) => {
+            if(e.key === 'ArrowRight') { 
+                handleForward(videoRef)
+                context.setIsVisibleTools(true)
+                if (context.hideToolsTimer.current) clearTimeout(context.hideToolsTimer.current)
+                context.hideToolsTimer.current = setTimeout(() => context.setIsVisibleTools(false), 2000)
+            }
+            if(e.key === 'ArrowLeft') {
+                handleRewind(videoRef)
+                context.setIsVisibleTools(true)
+                if (context.hideToolsTimer.current) clearTimeout(context.hideToolsTimer.current)
+                context.hideToolsTimer.current = setTimeout(() => context.setIsVisibleTools(false), 2000)
+            }
+            if(e.key === ' ') {
+                context.setIsPaused((prev: boolean) => !prev)
+                context.setIsVisibleTools(true)
+                if (context.hideToolsTimer.current) clearTimeout(context.hideToolsTimer.current)
+                context.hideToolsTimer.current = setTimeout(() => context.setIsVisibleTools(false), 2000)
+            }
+        }
+
+        document.addEventListener('keyup', handleReel)
+
+        return () => {
+            document.removeEventListener('keyup', handleReel)
+        }
+    }, [])
+
     if (!videoRef || !videoRef.current) {
         return (
             <div className={styles.toolsBtns}>
@@ -33,33 +62,33 @@ export const PlayButtons: React.FC<IPlayButtons> = ({videoRef, duration}) => {
         <div className={styles.toolsBtns}>
             <button 
                 className={styles.rewindBtn} 
-                onClick={(e: any) => {
-                    handleRewind(videoRef, duration, context)
+                onClick={(e: React.MouseEvent) => {
+                    handleRewind(videoRef)
                 }}
             >
-                <img src={rewindIcon.src} alt="" height={30}/>
+                <img src={rewindIcon.src} alt="перемотать назад" height={30}/>
             </button>
             
             <button 
                 className={styles.playBtnWrap} 
-                onClick={(e: any) => {
+                onClick={(e: React.MouseEvent) => {
                     context.setIsPaused((prev: boolean) => !prev)
                 }}
             >
                 {videoRef.current.paused ? 
-                        <img className={styles.playBtn} src={playIcon.src} alt="" height={24} />
+                        <img className={styles.playBtn} src={playIcon.src} alt="кнопка плей" height={24} />
                     : 
-                        <img className={styles.pauseBtn} src={stopIcon.src} alt="" height={24} />
+                        <img className={styles.pauseBtn} src={stopIcon.src} alt="кнопка стоп" height={24} />
                 }
             </button>
             
             <button 
                 className={styles.forwardBtn} 
-                onClick={(e: any) => {
-                    handleForward(videoRef, duration, context)
+                onClick={(e: React.MouseEvent) => {
+                    handleForward(videoRef)
                 }}
             >
-                <img src={frowardIcon.src} alt="" height={30}/>
+                <img src={frowardIcon.src} alt="перемотать вперед" height={30}/>
             </button>
         </div>
     )

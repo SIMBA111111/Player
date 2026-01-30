@@ -1,8 +1,8 @@
-import { RefObject } from "react";
+import { Dispatch, RefObject, SetStateAction } from "react";
 import { ModalType } from "../models/settings-buttons.interface";
 import Hls from "hls.js";
 
-export const handleChangeVideoSpeed = (videoRef: RefObject<any>, value: number) => {
+export const handleChangeVideoSpeed = (videoRef: RefObject<HTMLVideoElement>, value: number) => {
     if(!videoRef || !videoRef.current) return
 
     videoRef.current.playbackRate = value 
@@ -28,16 +28,18 @@ export const goBack = (modalHistory: ModalType[], setModalHistory: (newModalHist
     }
 };
 
-export const handleOpenFullScreen = (isFull: boolean, setIsFull: (isFull: boolean) => void) => {
+export const handleOpenFullScreen = (setIsFull: Dispatch<SetStateAction<boolean>>) => {
     const playerContainer = document.getElementById('playerContainer')
     
-    if (isFull) {
-        document?.exitFullscreen()    
-        setIsFull(false)
-    } else {
-        playerContainer?.requestFullscreen()
-        setIsFull(true)
-    }
+    setIsFull((prev: Boolean) => {
+        if(prev) {
+            document?.exitFullscreen()    
+            return false
+        } else {
+            playerContainer?.requestFullscreen()
+            return true
+        }
+    })
 }
 
 export const enablePictureInPicture = async(videoRef: RefObject<HTMLVideoElement>) => {
