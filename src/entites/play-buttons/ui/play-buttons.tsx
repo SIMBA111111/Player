@@ -62,7 +62,7 @@ export const PlayButtons: React.FC<IPlayButtons> = ({videoRef, duration}) => {
         <div className={styles.toolsBtns}>
             <button 
                 className={styles.rewindBtn} 
-                onClick={(e: React.MouseEvent) => {
+                onClick={() => {
                     handleRewind(videoRef)
                 }}
             >
@@ -71,7 +71,7 @@ export const PlayButtons: React.FC<IPlayButtons> = ({videoRef, duration}) => {
             
             <button 
                 className={styles.playBtnWrap} 
-                onClick={(e: React.MouseEvent) => {
+                onClick={() => {
                     context.setIsPaused((prev: boolean) => !prev)
                 }}
             >
@@ -84,7 +84,7 @@ export const PlayButtons: React.FC<IPlayButtons> = ({videoRef, duration}) => {
             
             <button 
                 className={styles.forwardBtn} 
-                onClick={(e: React.MouseEvent) => {
+                onClick={() => {
                     handleForward(videoRef)
                 }}
             >
