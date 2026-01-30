@@ -57,7 +57,7 @@ interface IPlayer {
     fragments: IFragment[]
 }
 
-export default function Player(props: IPlayer) {
+export const Player: React.FC<IPlayer> = ({playlistUrl, duration, fragments}) => {
 
   const videoRef = useRef<HTMLVideoElement>(null)
   
@@ -68,7 +68,9 @@ export default function Player(props: IPlayer) {
   
   useEffect(() =>{
     if (Hls.isSupported() && videoRef.current) {
-      hls.loadSource(props.playlistUrl)
+      console.log('playlistUrl ======= ', playlistUrl);
+      
+      hls.loadSource(playlistUrl)
       hls.attachMedia(videoRef.current)
       
     }
@@ -92,12 +94,12 @@ export default function Player(props: IPlayer) {
     console.log('hls.subtitleDisplay: ', hls.subtitleDisplay );
   })
 
-  hls.on(Hls.Events.BUFFER_APPENDED, () => {
-    console.log('чанк добавлен');
-    console.log('hls.allSubtitleTracks: ', hls.allSubtitleTracks );
-    console.log('hls.subtitleTracks: ', hls.subtitleTracks );
+  // hls.on(Hls.Events.BUFFER_APPENDED, () => {
+  //   console.log('чанк добавлен');
+  //   console.log('hls.allSubtitleTracks: ', hls.allSubtitleTracks );
+  //   console.log('hls.subtitleTracks: ', hls.subtitleTracks );
 
-  })
+  // })
 
   hls.on(Hls.Events.MANIFEST_PARSED, () => {
     const levels = hls.levels
@@ -138,7 +140,7 @@ hls.on(Hls.Events.ERROR, (event, data) => {
 
   return (
     <PlayerProvider videoRef={videoRef} hls={hls}>
-      <VideoTag duration={props.duration} videoRef={videoRef} fragments={props.fragments}/>
+      <VideoTag duration={duration} videoRef={videoRef} fragments={fragments}/>
     </PlayerProvider>
   );
 }
