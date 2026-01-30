@@ -17,7 +17,7 @@ import styles from './styles.module.scss';
 
 interface IProgressBar {
     duration: number;
-    videoRef: RefObject<any>;
+    videoRef: RefObject<HTMLVideoElement>;
     fragments: IFragment[];
 }
 
@@ -32,7 +32,7 @@ export const ProgressBar: React.FC<IProgressBar> = ({
     fragments,
 }) => {
     const [hoverTime, setHoverTime] = useState<number>(0);
-    const [isDragging, setIsDragging] = useState(false);
+    const [isDragging, setIsDragging] = useState<boolean>(false);
     const [bufferedFragments, setBufferedFragments] = useState<IBufferedFragment[]>([]);
     const [currentVideoTime, setCurrentVideoTime] = useState(0); // Локальное состояние для времени
     const progressContainerRef = useRef<HTMLDivElement>(null);
@@ -174,7 +174,7 @@ export const ProgressBar: React.FC<IProgressBar> = ({
                 ref={progressContainerRef}
                 className={styles.progressContainer}
                 onClick={(e: React.MouseEvent) => handleClick(e, isDragging, duration, progressContainerRef, videoRef, setCurrentVideoTime)}
-                onMouseDown={(e: any) => { 
+                onMouseDown={(e: React.MouseEvent) => { 
                     handleMouseDown(e, setIsDragging);
                 }}
                 onMouseLeave={() => {

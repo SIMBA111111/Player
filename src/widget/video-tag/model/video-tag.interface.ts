@@ -14,6 +14,5 @@ export interface IVideoTag {
 }
 
 export interface IVideoTagHandlers {
-    hideToolsTimer: RefObject<any>
     setIsVisibleTools: (isVisible: boolean) => void
 }

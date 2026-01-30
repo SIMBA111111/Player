@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react'
 
 import { usePlayerContext } from '../../../component'
-
 import { closeModal, enablePictureInPicture, goBack, handleChangeVideoSpeed, handleOpenFullScreen, openModal } from '../lib/handlers'
 import { ISettingsButtons, ModalType } from '../models/settings-buttons.interface'
 
@@ -14,6 +13,7 @@ import subtitleIcon from '../../../assets/images/png/subtitle.png'
 import pictureInPictureIcon from '../../../assets/images/png/picture-in-picture.png'
 
 import styles from './styles.module.scss'
+import { Level } from 'hls.js'
 
 
 export const SettingsButtons: React.FC<ISettingsButtons> = ({videoRef}) => {
@@ -32,8 +32,30 @@ export const SettingsButtons: React.FC<ISettingsButtons> = ({videoRef}) => {
             }
         }
 
-        window.addEventListener('mousedown', handleClickOutSide) 
+        window.addEventListener('mousedown', handleClickOutSide)
+        
+        return () => {
+            window.removeEventListener('mousedown', handleClickOutSide)
+        }
     }, [videoRef])
+
+    useEffect(() => {
+        console.log('useEffect');
+
+        const handlePressFtoFullScreen = (e: KeyboardEvent) => {
+            if (e.key.toLowerCase() === 'f') {
+                console.log('F');
+                
+                handleOpenFullScreen(setIsFull)
+            }
+        }
+
+        document.addEventListener('keyup', handlePressFtoFullScreen)
+    
+        return () => {
+            document.removeEventListener('keyup', handlePressFtoFullScreen)
+        }
+    }, [])
 
     const handleSpeed = (value: number) => {
         handleChangeVideoSpeed(videoRef, value)
@@ -45,9 +67,12 @@ export const SettingsButtons: React.FC<ISettingsButtons> = ({videoRef}) => {
         closeModal(modalHistory, setModalHistory, setActiveModal)
     }
 
+    console.log('isFull = ', isFull);
+    
+
     return (
         <div className={styles.settingsContainer}>
-            <button className={styles.subtitle} onClick={(e: any) => context.hls.subtitleDisplay ? context.hls.subtitleDisplay = false : context.hls.subtitleDisplay = true}>
+            <button className={styles.subtitle} onClick={(e: React.MouseEvent) => context.hls.subtitleDisplay ? context.hls.subtitleDisplay = false : context.hls.subtitleDisplay = true}>
                 <img src={subtitleIcon.src} alt="субтитры" className={styles.subtitle__img} />
             </button>
             <button className={styles.subtitle} onClick={(e: React.MouseEvent) => enablePictureInPicture(videoRef)}>
@@ -85,7 +110,7 @@ export const SettingsButtons: React.FC<ISettingsButtons> = ({videoRef}) => {
                 {activeModal === 'quality' && (
                     <div className={styles.modal} onClick={() => goBack(modalHistory, setModalHistory, setActiveModal)}>
                         <h3 className={styles.modalHeader}>{'<'} Quality</h3>
-                        {context.hls.levels.map((level: any, index: number) => {
+                        {context.hls.levels.map((level: Level, index: number) => {
                             return (
                                 <button className={styles.modalBtn} key={index} onClick={() => handleChangeQualityLevel(index)}>{level?.height}p</button>
                             )
@@ -108,7 +133,7 @@ export const SettingsButtons: React.FC<ISettingsButtons> = ({videoRef}) => {
                     </div>
                 )}
             </div>
-            <button className={styles.fullScreen} onClick={(e: any) => handleOpenFullScreen(isFull, setIsFull)}>
+            <button className={styles.fullScreen} onClick={(e: React.MouseEvent) => handleOpenFullScreen(setIsFull)}>
                 {isFull ? <img src={fullScreenOffIcon.src} className={styles.fullScreenImg} /> : <img src={fullScreenOnIcon.src} className={styles.fullScreenImg}/>}
             </button>
         </div>

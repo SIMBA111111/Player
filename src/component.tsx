@@ -1,7 +1,7 @@
 'use client'
 
 import Hls from "hls.js";
-import { createContext, RefObject, useCallback, useContext, useEffect, useRef, useState } from "react";
+import { createContext, Dispatch, RefObject, SetStateAction, useCallback, useContext, useEffect, useRef, useState } from "react";
 
 import { VideoTag } from "./widget/video-tag/ui/video-tag";
 import React from "react";
@@ -11,6 +11,9 @@ interface IPlayerContext {
   isPaused: boolean;
   setIsPaused: React.Dispatch<React.SetStateAction<boolean>>;
   hls: Hls
+  hideToolsTimer: RefObject<NodeJS.Timeout | null>
+  isVisibleTools: boolean,
+  setIsVisibleTools: Dispatch<SetStateAction<boolean>>
 }
 
 export const playerContext = createContext<IPlayerContext | null>(null);
@@ -23,6 +26,9 @@ interface PlayerProviderProps {
 
 const PlayerProvider: React.FC<PlayerProviderProps> = ({ children, videoRef, hls }) => {
   const [isPaused, setIsPaused] = useState<boolean>(true);
+  const [isVisibleTools, setIsVisibleTools] = useState<boolean>(false)
+
+  const hideToolsTimer = useRef<NodeJS.Timeout>(null)
 
   if (isPaused) {
     videoRef?.current?.pause()
@@ -33,7 +39,10 @@ const PlayerProvider: React.FC<PlayerProviderProps> = ({ children, videoRef, hls
   const value: IPlayerContext = {
     isPaused,
     setIsPaused,
-    hls
+    hls,
+    hideToolsTimer,
+    isVisibleTools,
+    setIsVisibleTools
   };
 
   return (
@@ -121,21 +130,25 @@ export const Player: React.FC<IPlayer> = ({playlistUrl, duration, fragments}) =>
     // }
   })
 
-  hls.on(Hls.Events.LEVEL_SWITCHED, () => {
-    console.log('Обновлено качество: ', hls.currentLevel);
+  // hls.on(Hls.Events.LEVEL_SWITCHED, () => {
+  //   console.log('Обновлено качество: ', hls.currentLevel);
     
-  })
+  // })
 
-  hls.on(Hls.Events.SUBTITLE_TRACKS_UPDATED, (event, data) => {
-  console.log('SUBTITLE_TRACKS_UPDATED:', data.subtitleTracks);
-});
+//   hls.on(Hls.Events.SUBTITLE_TRACKS_UPDATED, (event, data) => {
+//   console.log('SUBTITLE_TRACKS_UPDATED:', data.subtitleTracks);
+// });
 
-hls.on(Hls.Events.SUBTITLE_TRACK_SWITCH, (event, data) => {
-  console.log('SUBTITLE_TRACK_SWITCH:', data);
-});
+// hls.on(Hls.Events.SUBTITLE_TRACK_SWITCH, (event, data) => {
+//   console.log('SUBTITLE_TRACK_SWITCH:', data);
+// });
 
 hls.on(Hls.Events.ERROR, (event, data) => {
   console.error('HLS ERROR:', data);
+});
+
+hls.on(Hls.Events.LEVEL_LOADED, (event, data) => {
+  console.error('уровни загружены:', data);
 });
 
   return (

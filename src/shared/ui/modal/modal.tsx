@@ -43,7 +43,7 @@ export const Modal: React.FC<IModal> = ({children, title, level}) => {
     
     return (
         <div className={context?.openedModal === title ? styles.wrappedModal : styles.wrappedModal_hidden}>
-            <div className={styles.modalTitle} onClick={(e: any) => context?.setOpenedModal(title)}>{title}</div>
+            <div className={styles.modalTitle} onClick={(e: React.MouseEvent) => context?.setOpenedModal(title)}>{title}</div>
             {children}
         </div>
     )
