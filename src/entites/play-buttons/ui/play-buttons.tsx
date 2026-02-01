@@ -60,6 +60,7 @@ export const PlayButtons: React.FC<IPlayButtons> = ({videoRef, duration}) => {
 
     return (
         <div className={styles.toolsBtns}>
+            {/* <div className={styles.plauBtnsWrap}> */}
             <button 
                 className={styles.rewindBtn} 
                 onClick={() => {
@@ -90,6 +91,7 @@ export const PlayButtons: React.FC<IPlayButtons> = ({videoRef, duration}) => {
             >
                 <img src={frowardIcon.src} alt="перемотать вперед" height={30}/>
             </button>
+            {/* </div> */}
         </div>
     )
 } 

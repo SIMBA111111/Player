@@ -1,3 +1,7 @@
+// .progressBarContainer {
+//     z-index: 1000;
+// }
+
 .progressContainer {
     position: relative;
     width: 100%;
@@ -5,6 +9,7 @@
     cursor: pointer;
     overflow: hidden;
     border-radius: 0px;
+    z-index: 200;
 }
 
 .background {
@@ -21,7 +26,7 @@
     // position: absolute;
     height: 100%;
     top: 0;
-    z-index: 1;
+    z-index: 1000;
     // pointer-events: none;
     // border-radius: 200px;
     background-repeat: no-repeat;
@@ -35,7 +40,7 @@
 
 .progressTimeHover {
     position: absolute;
-    bottom: 130px;
+    bottom: 100%;
     transform: translateX(-50%);
     background: rgba(0, 0, 0, 0.8);
     color: white;
@@ -59,4 +64,5 @@
     display: flex;
     flex-direction: row;
     gap: 2px;
+    z-index: 100;
 }

@@ -27,13 +27,17 @@ body {
 
 .toolsWrapper {
     position: absolute;
-    top: 85%;
+    bottom: 0;
     left: -0;
     width: 100%;
-    height: 15%;
-    // cursor: pointer;
+    height: 8%;
     display: block;
     pointer-events: auto;
+
+    
+    @media (width > 1440px) {
+        height: 8%;
+    }
 }
 
 .toolsBackground {
@@ -41,17 +45,17 @@ body {
     bottom: 0;
     left: 0;
     width: 100%;
-    height: 92%;
+    height: 100%;
     background-color: rgba(255, 255, 255, 0.7); 
     pointer-events: none;
-    z-index: 5;
+    z-index: 1;
 }
 
 .toolsArea {
     position: absolute;
     bottom: 0;
     width: 100%;
-    height: 88%;
+    height:100%;
     display: flex;
     align-self: flex-end;
     justify-content: end;

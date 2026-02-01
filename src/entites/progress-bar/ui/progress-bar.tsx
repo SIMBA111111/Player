@@ -158,7 +158,7 @@ export const ProgressBar: React.FC<IProgressBar> = ({
     }, [videoRef]);
 
     return (
-        <>
+        <div className={styles.progressBarContainer}>
             <div 
                 id='timeHover' 
                 className={hoverTime ? styles.progressTimeHover : styles.progressTimeHover_hidden}
@@ -189,6 +189,6 @@ export const ProgressBar: React.FC<IProgressBar> = ({
                     {getProgressBarFragments({duration, fragments,bufferedFragments, currentVideoTime })}
                 </div>
             </div>
-        </>
+        </div>
     );
 };

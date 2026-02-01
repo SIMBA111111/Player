@@ -1,9 +1,13 @@
 .settingsContainer {
     display: flex;
-    gap: 20px;
+    gap: 10px;
     position: absolute;
-    top: 40%;
+    bottom: 0;
+    height: 100%;
     right: 3%;
+    z-index: 100;
+    display: flex;
+    align-items: center;
 }
 
 .settingsOptions {
