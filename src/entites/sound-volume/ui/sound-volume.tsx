@@ -84,7 +84,8 @@ export const SoundAndTimeVolume: React.FC<ISoundVolume> = ({videoRef, duration, 
 
     return (
         <div className={styles.soundAndTimeContainer}>
-            <div className={isVisibleSoundBar ? styles.soundContainer : styles.soundContainer_hidden} 
+            {/* <div className={isVisibleSoundBar ? styles.soundContainer : styles.soundContainer_hidden}  */}
+            <div className={styles.soundContainer} 
                 onMouseEnter={() => setIsVisibleSoundBar(true)}
                 onMouseLeave={() => {
                     if (!isDraggingVolume) {
@@ -101,7 +102,8 @@ export const SoundAndTimeVolume: React.FC<ISoundVolume> = ({videoRef, duration, 
                 
                 <div 
                     id='soundVolumeBackground' 
-                    className={isVisibleSoundBar ? styles.soundVolumeBackground : styles.soundVolumeBackground_hidden} 
+                    // className={isVisibleSoundBar ? styles.soundVolumeBackground : styles.soundVolumeBackground_hidden} 
+                    className={styles.soundVolumeBackground} 
                     onClick={(e) => handleMouseClickSoundBtn(e, videoRef, setCurrentVolume)}
                     onMouseDown={(e) => handleMouseDownSoundBtn(setIsDraggingVolume)}
                 >
@@ -111,7 +113,8 @@ export const SoundAndTimeVolume: React.FC<ISoundVolume> = ({videoRef, duration, 
                         style={{width: `${currentVolume}%`}}
                     >
                         <div 
-                            className={isVisibleSoundBar ? styles.pointer : styles.pointer_hidden}
+                            // className={isVisibleSoundBar ? styles.pointer : styles.pointer_hidden}
+                            className={styles.pointer}
                             onMouseDown={(e) => {
                                 e.stopPropagation()
                                 handleMouseDownSoundBtn(setIsDraggingVolume)

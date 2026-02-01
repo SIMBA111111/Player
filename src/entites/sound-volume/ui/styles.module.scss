@@ -1,9 +1,9 @@
 .soundAndTimeContainer {
     width: 65%;
     height: 90%;
-    position: absolute;
+    // position: absolute;
     // top: 50%;
-    left: 13%;
+    // left: 13%;
     border: none;
     outline: none;
     cursor: pointer;
@@ -63,7 +63,7 @@
     cursor: pointer;
     
 
-    // top: -2px;
+    top: -2px;
     right: 0;
     transform: translateX(50%);
     

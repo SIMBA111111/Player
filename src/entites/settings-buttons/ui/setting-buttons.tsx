@@ -83,7 +83,7 @@ export const SettingsButtons: React.FC<ISettingsButtons> = ({videoRef}) => {
                     className={styles.settings} 
                     onClick={() => openModal('settings', setModalHistory, setActiveModal)}
                 >
-                    <img src={settingIcon.src} alt="" height={30}/>
+                    <img src={settingIcon.src} alt="" height={24}/>
                 </button>
                 
                 {/* Основная модалка настроек */}

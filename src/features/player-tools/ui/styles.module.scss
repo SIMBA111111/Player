@@ -28,16 +28,28 @@ body {
 .toolsWrapper {
     position: absolute;
     bottom: 0;
-    left: -0;
+    // left: -0;
     width: 100%;
-    height: 8%;
+    height: 6%;
     display: block;
     pointer-events: auto;
 
     
-    @media (width > 1440px) {
-        height: 8%;
+    @media (max-width: 1080px) {
+        height: 7%;
     }
+    
+    @media (max-width: 1440px) {
+        height: 7%;
+    }
+
+    @media (max-width: 1920px) {
+        height: 6%;
+    }
+
+    // @media (max-width: 2500px) {
+    //     height: 10%;
+    // }
 }
 
 .toolsBackground {
@@ -52,13 +64,23 @@ body {
 }
 
 .toolsArea {
-    position: absolute;
-    bottom: 0;
+    // position: absolute;
+    // bottom: 0;
     width: 100%;
     height:100%;
     display: flex;
-    align-self: flex-end;
-    justify-content: end;
-    align-items: end;
+    justify-content: space-between;
+
+    // align-self: flex-end;
+    // justify-content: end;
+    // align-items: end;
     z-index: 50;
+}
+
+.toolsArea2 {
+    width: 100%;
+    display: flex;
+    gap: 20px;
+    height:100%;
+    justify-content: start;
 }

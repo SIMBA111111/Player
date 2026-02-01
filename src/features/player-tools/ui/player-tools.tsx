@@ -26,8 +26,8 @@ export const PlayerTools: React.FC<IPlayerTools> = ({
     }
 
     return (
-        <div className={isVisibleTools ? styles.toolsContainer : styles.toolsContainer_hidden}>
-        {/* // <div className={styles.toolsContainer}> */}
+        // <div className={isVisibleTools ? styles.toolsContainer : styles.toolsContainer_hidden}>
+        <div className={styles.toolsContainer}>
             <div className={styles.toolsWrapper}
                 onClick={(e) => e.stopPropagation()}
             >             
@@ -39,14 +39,16 @@ export const PlayerTools: React.FC<IPlayerTools> = ({
 
                 <div className={styles.toolsBackground}></div>
                 
-                {/* <div className={styles.toolsArea}> */}
+                <div className={styles.toolsArea}>
+                    <div className={styles.toolsArea2}>
 
-                    <PlayButtons videoRef={videoRef} duration={duration}/>
+                        <PlayButtons videoRef={videoRef} duration={duration}/>
 
-                    <SoundAndTimeVolume videoRef={videoRef} duration={duration} fragmentTitle={handleGetCurrentFragment()?.title}/>
-
+                        <SoundAndTimeVolume videoRef={videoRef} duration={duration} fragmentTitle={handleGetCurrentFragment()?.title}/>
+                    
+                    </div>
                     <SettingsButtons videoRef={videoRef}/>
-                {/* </div> */}
+                </div>
             </div>
         </div>
     );
