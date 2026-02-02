@@ -2,6 +2,9 @@
 
 import {Player} from "@/component";
 
+
+// СТАРТУЕМ ПЕРЕДЕЛ ПОД ЛАЙВЫ
+
 const VIDEODATA = {
   // url: '/videos/hls_output/master.m3u8',
   // duration: 9.333,
