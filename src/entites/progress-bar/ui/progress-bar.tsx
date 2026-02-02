@@ -16,9 +16,10 @@ import {
 import styles from './styles.module.scss';
 
 interface IProgressBar {
-    duration: number;
+    duration?: number;
     videoRef: RefObject<HTMLVideoElement>;
-    fragments: IFragment[];
+    fragments?: IFragment[];
+    isLiveStream?: boolean
 }
 
 interface IBufferedFragment {
@@ -30,6 +31,7 @@ export const ProgressBar: React.FC<IProgressBar> = ({
     duration, 
     videoRef, 
     fragments,
+    isLiveStream
 }) => {
     const [hoverTime, setHoverTime] = useState<number>(0);
     const [isDragging, setIsDragging] = useState<boolean>(false);
@@ -156,6 +158,8 @@ export const ProgressBar: React.FC<IProgressBar> = ({
             videoElement.removeEventListener('loadeddata', updateBufferedRanges);
         };
     }, [videoRef]);
+
+    if (isLiveStream || !duration) return <div>это стрим, нужно переделать прогрес бар</div>
 
     return (
         <div className={styles.progressBarContainer}>

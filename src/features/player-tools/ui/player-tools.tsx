@@ -42,7 +42,7 @@ export const PlayerTools: React.FC<IPlayerTools> = ({
                 <div className={styles.toolsArea}>
                     <div className={styles.toolsArea2}>
 
-                        <PlayButtons videoRef={videoRef} duration={duration}/>
+                        <PlayButtons videoRef={videoRef}/>
 
                         <SoundAndTimeVolume videoRef={videoRef} duration={duration} fragmentTitle={handleGetCurrentFragment()?.title}/>
                     

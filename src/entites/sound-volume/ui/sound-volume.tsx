@@ -20,7 +20,7 @@ import styles from './styles.module.scss'
 
 interface ISoundVolume {
     videoRef: RefObject<HTMLVideoElement | null>
-    duration: number;
+    duration?: number;
     fragmentTitle: string | undefined;
 }  
 
@@ -81,6 +81,9 @@ export const SoundAndTimeVolume: React.FC<ISoundVolume> = ({videoRef, duration, 
     }, [isDraggingVolume, videoRef])
 
     if(!videoRef.current) return null
+
+    if (!duration) return <div>это стрим, нужно переделать прогрес бар</div>
+
 
     return (
         <div className={styles.soundAndTimeContainer}>

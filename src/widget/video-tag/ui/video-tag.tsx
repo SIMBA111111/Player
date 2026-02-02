@@ -10,7 +10,7 @@ import { IVideoTag } from "../model/video-tag.interface"
 import styles from './styles.module.scss'
 
 
-export const VideoTag: React.FC<IVideoTag> = ({duration, videoRef, fragments}) => {
+export const VideoTag: React.FC<IVideoTag> = ({duration, videoRef, fragments, isLiveStream}) => {
     const context = usePlayerContext();
 
     const {handleMouseMove, handleMouseLeave} = 

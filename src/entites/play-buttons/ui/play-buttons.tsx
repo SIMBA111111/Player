@@ -15,10 +15,9 @@ import styles from './styles.module.scss'
 
 interface IPlayButtons {
     videoRef: RefObject<HTMLVideoElement | null>
-    duration: number;
 }   
 
-export const PlayButtons: React.FC<IPlayButtons> = ({videoRef, duration}) => {
+export const PlayButtons: React.FC<IPlayButtons> = ({videoRef}) => {
     const context = usePlayerContext();
 
     useEffect(() => {

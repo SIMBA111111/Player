@@ -62,16 +62,23 @@ export const usePlayerContext = () => {
 
 interface IPlayer {
     playlistUrl: string
-    duration: number
-    fragments: IFragment[]
+    duration?: number
+    fragments?: IFragment[]
+    isLiveStream?: boolean
 }
 
-export const Player: React.FC<IPlayer> = ({playlistUrl, duration, fragments}) => {
+export const Player: React.FC<IPlayer> = ({playlistUrl, duration, fragments, isLiveStream = false}) => {
 
   const videoRef = useRef<HTMLVideoElement>(null)
   
-  const hls = new Hls({startLevel: -1, maxBufferLength: 10, lowLatencyMode: false, maxBufferSize: 10 * 1000 * 1000,
+  const hls = new Hls({startLevel: -1,
+    maxBufferLength: 10,
+    lowLatencyMode: false,
     maxMaxBufferLength: 60, 
+    liveSyncDurationCount: 3,
+    liveDurationInfinity: true,
+    autoStartLoad: true,
+    enableWorker: true
     // debug: true
   })
   
@@ -153,7 +160,7 @@ hls.on(Hls.Events.LEVEL_LOADED, (event, data) => {
 
   return (
     <PlayerProvider videoRef={videoRef} hls={hls}>
-      <VideoTag duration={duration} videoRef={videoRef} fragments={fragments}/>
+      <VideoTag duration={duration} videoRef={videoRef} fragments={fragments} isLiveStream={isLiveStream}/>
     </PlayerProvider>
   );
 }
