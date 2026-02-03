@@ -14,6 +14,8 @@ interface IPlayerContext {
   hideToolsTimer: RefObject<NodeJS.Timeout | null>
   isVisibleTools: boolean,
   setIsVisibleTools: Dispatch<SetStateAction<boolean>>
+  isLiveStream: boolean
+  isLiveStreamEnded: boolean,
 }
 
 export const playerContext = createContext<IPlayerContext | null>(null);
@@ -22,19 +24,20 @@ interface PlayerProviderProps {
   children: React.ReactNode;
   videoRef: RefObject<HTMLVideoElement | null>
   hls: Hls
+  isLiveStream: boolean
+  isLiveStreamEnded: boolean
 }
 
-const PlayerProvider: React.FC<PlayerProviderProps> = ({ children, videoRef, hls }) => {
+const PlayerProvider: React.FC<PlayerProviderProps> = ({ children, videoRef, hls, isLiveStream, isLiveStreamEnded }) => {
   const [isPaused, setIsPaused] = useState<boolean>(true);
   const [isVisibleTools, setIsVisibleTools] = useState<boolean>(false)
-
   const hideToolsTimer = useRef<NodeJS.Timeout>(null)
-
   if (isPaused) {
     videoRef?.current?.pause()
   } else {
     videoRef?.current?.play()
   }
+  
 
   const value: IPlayerContext = {
     isPaused,
@@ -42,7 +45,9 @@ const PlayerProvider: React.FC<PlayerProviderProps> = ({ children, videoRef, hls
     hls,
     hideToolsTimer,
     isVisibleTools,
-    setIsVisibleTools
+    setIsVisibleTools,
+    isLiveStream,
+    isLiveStreamEnded,
   };
 
   return (
@@ -62,7 +67,7 @@ export const usePlayerContext = () => {
 
 interface IPlayer {
     playlistUrl: string
-    duration?: number
+    duration: number
     fragments?: IFragment[]
     isLiveStream?: boolean
 }
@@ -70,6 +75,7 @@ interface IPlayer {
 export const Player: React.FC<IPlayer> = ({playlistUrl, duration, fragments, isLiveStream = false}) => {
 
   const videoRef = useRef<HTMLVideoElement>(null)
+  const [isLiveStreamEnded, setIsLiveStreamEnded] = useState<boolean>(false)
   
   const hls = new Hls({startLevel: -1,
     maxBufferLength: 10,
@@ -84,7 +90,6 @@ export const Player: React.FC<IPlayer> = ({playlistUrl, duration, fragments, isL
   
   useEffect(() =>{
     if (Hls.isSupported() && videoRef.current) {
-      console.log('playlistUrl ======= ', playlistUrl);
       
       hls.loadSource(playlistUrl)
       hls.attachMedia(videoRef.current)
@@ -150,16 +155,17 @@ export const Player: React.FC<IPlayer> = ({playlistUrl, duration, fragments, isL
 //   console.log('SUBTITLE_TRACK_SWITCH:', data);
 // });
 
-hls.on(Hls.Events.ERROR, (event, data) => {
-  console.error('HLS ERROR:', data);
-});
-
-hls.on(Hls.Events.LEVEL_LOADED, (event, data) => {
-  console.error('уровни загружены:', data);
-});
+  hls.on(Hls.Events.ERROR, (event, data) => {
+    if (typeof data.response?.data === 'string' && data.response.data.includes('#EXT-X-ENDLIST')) {
+      console.log('Стрим закончился');
+      setIsLiveStreamEnded(true)
+    } else {
+      console.error('HLS ERROR:', data);
+    }
+  });
 
   return (
-    <PlayerProvider videoRef={videoRef} hls={hls}>
+    <PlayerProvider videoRef={videoRef} hls={hls} isLiveStream={isLiveStream} isLiveStreamEnded={isLiveStreamEnded}>
       <VideoTag duration={duration} videoRef={videoRef} fragments={fragments} isLiveStream={isLiveStream}/>
     </PlayerProvider>
   );

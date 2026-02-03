@@ -16,7 +16,7 @@ import {
 import styles from './styles.module.scss';
 
 interface IProgressBar {
-    duration?: number;
+    duration: number;
     videoRef: RefObject<HTMLVideoElement>;
     fragments?: IFragment[];
     isLiveStream?: boolean
@@ -190,7 +190,7 @@ export const ProgressBar: React.FC<IProgressBar> = ({
             >
                 {/* Фрагменты прогресса */}
                 <div className={styles.fragmentsContainer}>
-                    {getProgressBarFragments({duration, fragments,bufferedFragments, currentVideoTime })}
+                    {getProgressBarFragments({duration, fragments, bufferedFragments, currentVideoTime })}
                 </div>
             </div>
         </div>

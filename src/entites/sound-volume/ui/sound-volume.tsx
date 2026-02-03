@@ -16,11 +16,12 @@ import soundOnIcon from '../../../assets/images/png/sound.png'
 import soundOffIcon from '../../../assets/images/png/sound-off.png'
 
 import styles from './styles.module.scss'
+import { usePlayerContext } from '../../../component'
 
 
 interface ISoundVolume {
     videoRef: RefObject<HTMLVideoElement | null>
-    duration?: number;
+    duration: number;
     fragmentTitle: string | undefined;
 }  
 
@@ -29,6 +30,7 @@ export const SoundAndTimeVolume: React.FC<ISoundVolume> = ({videoRef, duration, 
     const [currentVolume, setCurrentVolume] = useState<number>(50)
     const [isDraggingVolume, setIsDraggingVolume] = useState<boolean>(false)
     const [currentTime, setCurrentTime] = useState<number>(0)
+    const context = usePlayerContext()
 
     // Обновление времени видео
     useEffect(() => {
@@ -82,8 +84,6 @@ export const SoundAndTimeVolume: React.FC<ISoundVolume> = ({videoRef, duration, 
 
     if(!videoRef.current) return null
 
-    if (!duration) return <div>это стрим, нужно переделать прогрес бар</div>
-
 
     return (
         <div className={styles.soundAndTimeContainer}>
@@ -132,7 +132,11 @@ export const SoundAndTimeVolume: React.FC<ISoundVolume> = ({videoRef, duration, 
             </div>
             
             <div className={styles.indicateTime}>
-                {getHHSStime(Math.trunc(currentTime))} / {getHHSStime(Math.trunc(duration))} 
+                {getHHSStime(Math.trunc(currentTime))} / {getHHSStime(Math.trunc(duration))}
+            </div>
+
+            <div className={styles.indicateTime}>
+                { context.isLiveStreamEnded && 'стрим окончен'}  
             </div>
 
             <div className={styles.fragmentTitle}>{fragmentTitle}</div>

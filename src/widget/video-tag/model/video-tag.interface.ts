@@ -8,7 +8,7 @@ export interface IFragment{
 }
 
 export interface IVideoTag {
-    duration?: number
+    duration: number
     videoRef: RefObject<HTMLVideoElement | null>
     fragments?: IFragment[]
     isLiveStream?: boolean
