@@ -67,7 +67,7 @@ export const SettingsButtons: React.FC<ISettingsButtons> = ({videoRef}) => {
         closeModal(modalHistory, setModalHistory, setActiveModal)
     }
 
-    console.log('isFull = ', isFull);
+    // console.log('isFull = ', isFull);
     
 
     return (
